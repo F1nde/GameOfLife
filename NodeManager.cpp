@@ -6,6 +6,8 @@ NodeManager::NodeManager(int boardHeight, int boardWidth)
 	mBoardHeight = boardHeight;
 	mBoardWidth = boardWidth;
 
+	mBoardString = std::string(mBoardHeight * mBoardWidth, 'x');
+
 	CreateNodes();
 }
 
@@ -94,10 +96,13 @@ void NodeManager::CreateNodes()
 				// Validity checks for neighbours
 				bool indexIsInsideBoard = (index >= 0 && index < lastIndex);
 				bool indexIsOnRightRow = (index >= rowMin && index <= rowMax);
-				bool indexIsNotNodeItself = mAllNodes[index]->GetNodeId() != mAllNodes[i]->GetNodeId();
 
-				if (indexIsInsideBoard && indexIsOnRightRow && indexIsNotNodeItself)
-					neighbors.push_back(mAllNodes[index]);
+				if (indexIsInsideBoard && indexIsOnRightRow)
+				{
+					bool indexIsNotNodeItself = mAllNodes[index]->GetNodeId() != mAllNodes[i]->GetNodeId();
+					if (indexIsNotNodeItself)
+						neighbors.push_back(mAllNodes[index]);
+				}
 			}
 		}
 
