@@ -1,3 +1,4 @@
+
 #ifndef __GAME_H__
 #define __GAME_H__
 
@@ -5,7 +6,6 @@
 
 #include <string>
 
-//#pragma once
 class Game
 {
 public:
@@ -14,33 +14,20 @@ public:
 
 	void StartGame();
 
-	void NodeStateChange(Node* node, State state);
-
 private:
 	//void HandlePlayerInput(std::string input);
-
-	//void ChangeState();
 
 	void ShowBoard();
 	void ClearGame();
 
 	// Board
-	int mHeight;
-	int mWidth;
-	std::string mBoardString;
+	int mHeight = 0;
+	int mWidth = 0;
 
-	NodeManager* mNodeManager;
-
-	// Nodes
-	/*
-	std::vector<Node*> mAllNodes;
-	std::vector<Node*> mAliveNodes;
-	std::vector<Node*> mTouchedNodes;
-	*/
+	NodeManager* mNodeManager = NULL;
 
 	// Other
 	int mRound = 0;
-
 	bool mDarkMode = false;
 };
 

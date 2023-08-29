@@ -1,7 +1,6 @@
+
 #ifndef __NODE_H__
 #define __NODE_H__
-
-//#include "Game.h"
 
 #include <vector>
 
@@ -10,14 +9,12 @@ enum class State
 	Dead = 0,
 	Alive,
 	WaitingForRevive,
-	Modified
 };
 
-//#pragma once
 class Node
 {
 public:
-	Node(/*Game* game,*/ int index);
+	Node(int index);
 	~Node();
 
 	void Init(std::vector<Node*> neighbors);
@@ -25,25 +22,19 @@ public:
 	void SetState(State state);
 	State GetState();
 
-	//std::vector<Node*> NewRoundStart(int round);
-	void TouchNode(int round);
-
 	std::vector<Node*> GetRevivableNeighbours(int round);
 	bool IsAliveNextRound(int round);
 
-	int GetIndex();
+	int GetNodeId();
 
 private:
-	int mIndex;
-	State mCurrentState;
-	std::vector<Node*> mNeighbors;
+	int mNodeId = 0;
+	State mCurrentState = State::Dead;
+	std::vector<Node*> mNeighbors = std::vector<Node*>();
 
 	// This round
 	int mCurrentRound = 0;
-	int mTouches = 0;
 	bool mIsAliveAfterThisRound = true;
-
-	//Game* mGame;
 };
 
 #endif // __NODE_H__

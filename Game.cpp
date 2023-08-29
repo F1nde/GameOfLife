@@ -1,3 +1,4 @@
+
 #include "Game.h"
 #include "NodeManager.h"
 
@@ -8,14 +9,14 @@
 #include <chrono>
 #include <thread>
 
-using namespace std;
+using std::cout;
+using std::cin;
+using std::string;
 
-using namespace std::this_thread; // sleep_for, sleep_until
-using namespace std::chrono; // nanoseconds, system_clock, seconds
+using namespace std::this_thread;
+using namespace std::chrono;
 
-Game::Game()
-{
-}
+Game::Game(){}
 
 Game::~Game()
 {
@@ -47,7 +48,6 @@ void Game::StartGame()
 
 	mNodeManager = new NodeManager(mHeight, mWidth);
 
-	mBoardString = std::string(mHeight * mWidth, 'x');
 	ShowBoard();
 
 	int x = 0;
@@ -67,16 +67,7 @@ void Game::StartGame()
 			x = std::stoi(input.substr(0, input.find("x")));
 			y = std::stoi(input.substr(input.find('x') + 1));
 
-			// TODO: Tsekkaa onko node jo elossa
-
 			mNodeManager->ReviveNode(x, y);
-
-			/*
-			index = x + y * mHeight;
-			mBoardString[index] = 'o';
-			mAllNodes[index]->SetState(State::Alive);
-			mAliveNodes.push_back(mAllNodes[index]);
-			*/
 
 			system("cls");
 			ShowBoard();
@@ -89,7 +80,6 @@ void Game::StartGame()
 	{
 		++mRound;
 
-		//ChangeState();
 		mNodeManager->AdvanceRound(mRound);
 		ShowBoard();
 		if (input != "s")
@@ -103,6 +93,7 @@ void Game::StartGame()
 			}
 			else if (input == "d")
 			{
+				
 				mDarkMode = true;
 			}
 		}
@@ -129,40 +120,6 @@ void Game::ClearGame()
 
 	mDarkMode = false;
 }
-
-//void Game::NodeStateChange(Node* node, State state)
-//{
-//	if (state == State::Dead)
-//	{
-//		if (std::find(mAliveNodes.begin(), mAliveNodes.end(), node) != mAliveNodes.end())
-//		{
-//			mAliveNodes.erase(std::find(mAliveNodes.begin(), mAliveNodes.end(), node));
-//		}
-//		else
-//		{
-//			// Error;
-//		}
-//	}
-//	else
-//		mAliveNodes.push_back(node);
-//}
-
-/*
-void Game::HandlePlayerInput(std::string input)
-{
-}
-*/
-
-//void Game::ChangeState()
-//{
-//	mTouchedNodes.clear();
-//	for (int i = 0; i < mAliveNodes.size(); ++i)
-//	{
-//		mAliveNodes[i]->NewRoundStart(mRound);
-//	}
-//
-//	++mRound;
-//}
 
 void Game::ShowBoard()
 {
