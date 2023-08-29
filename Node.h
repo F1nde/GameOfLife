@@ -9,6 +9,7 @@ enum class State
 {
 	Dead = 0,
 	Alive,
+	WaitingForRevive,
 	Modified
 };
 
@@ -24,8 +25,13 @@ public:
 	void SetState(State state);
 	State GetState();
 
-	std::vector<Node*> NewRoundStart(int round);
+	//std::vector<Node*> NewRoundStart(int round);
 	void TouchNode(int round);
+
+	std::vector<Node*> GetRevivableNeighbours(int round);
+	bool IsAliveNextRound(int round);
+
+	int GetIndex();
 
 private:
 	int mIndex;
@@ -35,6 +41,7 @@ private:
 	// This round
 	int mCurrentRound = 0;
 	int mTouches = 0;
+	bool mIsAliveAfterThisRound = true;
 
 	//Game* mGame;
 };

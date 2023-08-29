@@ -1,7 +1,7 @@
 #ifndef __GAME_H__
 #define __GAME_H__
 
-#include "Node.h"
+#include "Nodemanager.h"
 
 #include <string>
 
@@ -28,10 +28,14 @@ private:
 	int mWidth;
 	std::string mBoardString;
 
+	NodeManager* mNodeManager;
+
 	// Nodes
+	/*
 	std::vector<Node*> mAllNodes;
 	std::vector<Node*> mAliveNodes;
 	std::vector<Node*> mTouchedNodes;
+	*/
 
 	// Other
 	int mRound = 0;

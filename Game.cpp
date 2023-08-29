@@ -1,5 +1,5 @@
 #include "Game.h"
-#include "Node.h"
+#include "NodeManager.h"
 
 #include <stdlib.h>
 #include <iostream>
@@ -12,7 +12,8 @@ Game::Game()
 
 Game::~Game()
 {
-	// TODO
+	delete(mNodeManager);
+	mNodeManager = NULL;
 }
 
 void Game::StartGame()
@@ -38,11 +39,7 @@ void Game::StartGame()
 		mWidth = std::stoi(input);
 	}
 
-	for (int i = 0; i < mHeight * mWidth; ++i)
-	{
-		auto node = new Node(i);
-		mAllNodes.push_back(node);
-	}
+	mNodeManager = new NodeManager(mHeight, mWidth);
 
 	mBoardString = std::string(mHeight * mWidth, 'x');
 	ShowBoard();
@@ -54,7 +51,7 @@ void Game::StartGame()
 	bool startGame = false;
 	while (!startGame)
 	{
-		cout << "Next type alive nodes (x.y)! Example: 3.1 || Or Start game typing: s"; // Type a number and press enter
+		//cout << "Next type alive nodes (x.y)! Example: 3.1 || Or Start game typing: s"; // Type a number and press enter
 		cin >> input; // Get user input from the keyboard
 
 		if (input == "s")
@@ -66,10 +63,14 @@ void Game::StartGame()
 
 			// TODO: Tsekkaa onko node jo elossa
 
+			mNodeManager->ReviveNode(x, y);
+
+			/*
 			index = x + y * mHeight;
 			mBoardString[index] = 'o';
 			mAllNodes[index]->SetState(State::Alive);
 			mAliveNodes.push_back(mAllNodes[index]);
+			*/
 
 			system("cls");
 			ShowBoard();
@@ -79,28 +80,33 @@ void Game::StartGame()
 	bool playing = true;
 	while (playing)
 	{
-		ChangeState();
+		++mRound;
+
+		//ChangeState();
+		mNodeManager->AdvanceRound(mRound);
 		ShowBoard();
 		cin >> input; // Get user input from the keyboard
+
+		system("cls");
 	}
 }
 
-void Game::NodeStateChange(Node* node, State state)
-{
-	if (state == State::Dead)
-	{
-		if (std::find(mAliveNodes.begin(), mAliveNodes.end(), node) != mAliveNodes.end())
-		{
-			mAliveNodes.erase(std::find(mAliveNodes.begin(), mAliveNodes.end(), node));
-		}
-		else
-		{
-			// Error;
-		}
-	}
-	else
-		mAliveNodes.push_back(node);
-}
+//void Game::NodeStateChange(Node* node, State state)
+//{
+//	if (state == State::Dead)
+//	{
+//		if (std::find(mAliveNodes.begin(), mAliveNodes.end(), node) != mAliveNodes.end())
+//		{
+//			mAliveNodes.erase(std::find(mAliveNodes.begin(), mAliveNodes.end(), node));
+//		}
+//		else
+//		{
+//			// Error;
+//		}
+//	}
+//	else
+//		mAliveNodes.push_back(node);
+//}
 
 /*
 void Game::HandlePlayerInput(std::string input)
@@ -108,19 +114,20 @@ void Game::HandlePlayerInput(std::string input)
 }
 */
 
-void Game::ChangeState()
-{
-	mTouchedNodes.clear();
-	for (int i = 0; i < mAliveNodes.size(); ++i)
-	{
-		mAliveNodes[i]->NewRoundStart(mRound);
-	}
-
-	++mRound;
-}
+//void Game::ChangeState()
+//{
+//	mTouchedNodes.clear();
+//	for (int i = 0; i < mAliveNodes.size(); ++i)
+//	{
+//		mAliveNodes[i]->NewRoundStart(mRound);
+//	}
+//
+//	++mRound;
+//}
 
 void Game::ShowBoard()
 {
+	std::string boardString = mNodeManager->GetNodeString();
 	for(int i = 0; i < mHeight; ++i)
-		std::cout << "  " << mBoardString.substr(i * mWidth, mWidth) << '\n';
+		std::cout << "  " << boardString.substr(i * mWidth, mWidth) << '\n';
 }
