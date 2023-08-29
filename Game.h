@@ -19,9 +19,10 @@ public:
 private:
 	//void HandlePlayerInput(std::string input);
 
-	void ChangeState();
+	//void ChangeState();
 
 	void ShowBoard();
+	void ClearGame();
 
 	// Board
 	int mHeight;
@@ -39,6 +40,8 @@ private:
 
 	// Other
 	int mRound = 0;
+
+	bool mDarkMode = false;
 };
 
 #endif // __GAME_H__

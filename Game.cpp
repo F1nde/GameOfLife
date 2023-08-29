@@ -2,9 +2,16 @@
 #include "NodeManager.h"
 
 #include <stdlib.h>
+#include <algorithm>
 #include <iostream>
 
+#include <chrono>
+#include <thread>
+
 using namespace std;
+
+using namespace std::this_thread; // sleep_for, sleep_until
+using namespace std::chrono; // nanoseconds, system_clock, seconds
 
 Game::Game()
 {
@@ -12,8 +19,7 @@ Game::Game()
 
 Game::~Game()
 {
-	delete(mNodeManager);
-	mNodeManager = NULL;
+	ClearGame();
 }
 
 void Game::StartGame()
@@ -54,7 +60,7 @@ void Game::StartGame()
 		//cout << "Next type alive nodes (x.y)! Example: 3.1 || Or Start game typing: s"; // Type a number and press enter
 		cin >> input; // Get user input from the keyboard
 
-		if (input == "s")
+		if (input == "s" || input == "n" || input == "r")
 			startGame = true;
 		else
 		{
@@ -77,6 +83,7 @@ void Game::StartGame()
 		}
 	}
 
+	bool restartGame = false;
 	bool playing = true;
 	while (playing)
 	{
@@ -85,10 +92,42 @@ void Game::StartGame()
 		//ChangeState();
 		mNodeManager->AdvanceRound(mRound);
 		ShowBoard();
-		cin >> input; // Get user input from the keyboard
+		if (input != "s")
+		{
+			cin >> input; // Get user input from the keyboard
+
+			if (input == "r")
+			{
+				playing = false;
+				restartGame = true;
+			}
+			else if (input == "d")
+			{
+				mDarkMode = true;
+			}
+		}
+		else
+		{
+			sleep_for(nanoseconds(100000000));
+			system("cls");
+		}
+	}
+
+	if (restartGame)
+	{
+		ClearGame();
 
 		system("cls");
+		StartGame();
 	}
+}
+
+void Game::ClearGame()
+{
+	delete(mNodeManager);
+	mNodeManager = NULL;
+
+	mDarkMode = false;
 }
 
 //void Game::NodeStateChange(Node* node, State state)
@@ -128,6 +167,12 @@ void Game::HandlePlayerInput(std::string input)
 void Game::ShowBoard()
 {
 	std::string boardString = mNodeManager->GetNodeString();
-	for(int i = 0; i < mHeight; ++i)
-		std::cout << "  " << boardString.substr(i * mWidth, mWidth) << '\n';
+	for (int i = 0; i < mHeight; ++i)
+	{
+		string sub = boardString.substr(i * mWidth, mWidth);
+		if(mDarkMode)
+			std::replace(sub.begin(), sub.end(), 'x', ' '); // replace all 'x' to ' '
+
+		std::cout << "  " << sub << '\n';
+	}
 }

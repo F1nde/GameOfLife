@@ -107,9 +107,9 @@ bool Node::IsAliveNextRound(int round)
 
 			if (mCurrentState == State::Dead)
 			{
-				if(aliveNeighbors == 1)
+				if(aliveNeighbors == 3)
 					mIsAliveAfterThisRound = true;
-				else if (aliveNeighbors > 1)
+				else if (aliveNeighbors > 3)
 				{
 					mIsAliveAfterThisRound = false;
 					break;

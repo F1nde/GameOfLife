@@ -37,9 +37,10 @@ private:
 	int mWidth;
 	std::string mBoardString;
 
+	// 2d vector
+	//std::vector<std::vector<Node*>> mAllNodes;
 	std::vector<Node*> mAllNodes;
 	std::vector<Node*> mAliveNodes;
-	std::vector<Node*> mTouchedNodes;
 };
 
 #endif // __NODEMANAGER_H__
