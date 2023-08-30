@@ -9,6 +9,7 @@ enum class State
 	Dead = 0,
 	Alive,
 	WaitingForRevive,
+	WillStayAlive
 };
 
 class Node
@@ -21,6 +22,7 @@ public:
 
 	void SetState(State state);
 	State GetState();
+	bool IsAlive();
 
 	std::vector<Node*> GetRevivableNeighbours(int round);
 	bool IsAliveNextRound(int round);

@@ -44,9 +44,11 @@ void NodeManager::AdvanceRound(int round)
 	std::vector<Node*> aliveNodesNextRound;
 	for (int i = 0; i < mAliveNodes.size(); ++i)
 	{
+		// Get revivable neighbors from the node
 		auto nodes = mAliveNodes[i]->GetRevivableNeighbours(round);
 		aliveNodesNextRound.insert(aliveNodesNextRound.end(), nodes.begin(), nodes.end());
 
+		// Then check if the node itself will be alive
 		if (mAliveNodes[i]->IsAliveNextRound(round))
 			aliveNodesNextRound.push_back(mAliveNodes[i]);
 		else

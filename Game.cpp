@@ -195,14 +195,12 @@ void Game::InitLivingCells()
 void Game::RunTheGame()
 {
 	ClearScreen();
-
 	ShowBoard();
 
 	if (mAutoPlay)
 	{
-		//sleep_for(nanoseconds(100000000));
 		NextRound();
-		//sleep_for(nanoseconds(100000000));
+		sleep_for(nanoseconds(100000000));
 	}
 	else
 	{
@@ -405,6 +403,7 @@ void Game::ClearGame()
 	mAutoPlay = false;
 
 	mGameState = GameState::Init;
+	mRound = 0;
 	ClearScreen();
 }
 
