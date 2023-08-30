@@ -62,6 +62,7 @@ void NodeManager::AdvanceRound(int round)
 		mBoardString[aliveNodesNextRound[i]->GetNodeId()] = 'o';
 	}
 
+	mAliveNodes.clear();
 	mAliveNodes = aliveNodesNextRound;
 }
 

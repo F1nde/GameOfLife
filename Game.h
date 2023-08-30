@@ -5,6 +5,7 @@
 #include "Nodemanager.h"
 
 #include <string>
+#include <vector>
 
 enum class GameState
 {
@@ -40,6 +41,7 @@ private:
 	void ClearGame();
 
 	void ClearScreen();
+	void RunTestCase(int id);
 
 	// Board
 	int mHeight = 0;
@@ -53,6 +55,11 @@ private:
 
 	int mRound = 0;
 	bool mDarkMode = false;
+
+	// Auto testing
+	bool mTesting = false;
+	std::vector<std::string>::iterator mInputItr;
+	std::vector<std::string> mTestingInputs;
 };
 
 #endif // __GAME_H__

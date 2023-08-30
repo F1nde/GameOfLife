@@ -1,6 +1,7 @@
 
 #include "Game.h"
 #include "NodeManager.h"
+#include "TestInputs.h"
 
 #include <stdlib.h>
 #include <algorithm>
@@ -41,12 +42,28 @@ void Game::ShowRules()
 			cout << "|              Game Of Life              |" << '\n';
 			cout << "------------------------------------------" << '\n' << '\n';
 
+			cout << "Test patterns" << '\n';
+			cout << "- 1 => Block" << '\n';
+			cout << "- 2 => Bee-hive" << '\n';
+			cout << "- 3 => Loaf" << '\n';
+			cout << "- 4 => Boat" << '\n';
+			cout << "- 5 => Tub" << '\n';
+			cout << "- 6 => Blinker" << '\n';
+			cout << "- 7 => Toad" << '\n';
+			cout << "- 8 => Beacon" << '\n';
+			cout << "- 9 => Pulsar" << '\n';
+			cout << "- 10 => Penta-decathlon" << '\n';
+			cout << "- 11 => Glider" << '\n';
+			cout << "- 12 => Light-weight spaceship" << '\n';
+			cout << "- 13 => Middle-weight spaceship" << '\n';
+			cout << "- 14 => Heavy-weight spaceship" << '\n';
+
 			cout << "Inputs:" << '\n';
 			cout << "- r => Restarts the game" << '\n';
 			cout << "- e => Exit the program" << '\n' << '\n';
 
 			cout << "Board Size" << '\n';
-			cout << "- Input: Heigh x Width (Example: 3x5)" << '\n';
+			cout << "- Input: Width x Heigh (Example: 3x5)" << '\n';
 			cout << "- Both numbers need to be positive numbers" << '\n' << '\n';
 			break;
 		}
@@ -113,7 +130,7 @@ void Game::Update()
 			}
 			case GameState::PreGame:
 			{
-				if (!pregameRulesShown)
+				if (!pregameRulesShown && !mTesting)
 				{
 					ClearScreen();
 					ShowRules();
@@ -165,9 +182,11 @@ void Game::InitBoard()
 
 void Game::InitLivingCells()
 {
-	ShowBoard();
-
-	cout << "Cordinates for a living cell: ";
+	if (!mTesting)
+	{
+		ShowBoard();
+		cout << "Cordinates for a living cell: ";
+	}
 
 	std::string input = GetPlayerInput();
 	bool success = HandlePlayerInput(input);
@@ -181,8 +200,9 @@ void Game::RunTheGame()
 
 	if (mAutoPlay)
 	{
-		sleep_for(nanoseconds(100000000));
+		//sleep_for(nanoseconds(100000000));
 		NextRound();
+		//sleep_for(nanoseconds(100000000));
 	}
 	else
 	{
@@ -195,8 +215,21 @@ void Game::RunTheGame()
 
 std::string Game::GetPlayerInput()
 {
-	std::string input;
-	cin >> input;
+	std::string input = "";
+
+	if (mTesting)
+	{
+		if (mInputItr != mTestingInputs.end())
+		{
+			input = *mInputItr;
+			++mInputItr;
+		}
+		else
+			mTesting = false;
+	}
+
+	if(input == "")
+		cin >> input;
 
 	return input;
 }
@@ -257,15 +290,25 @@ bool Game::HandlePlayerInput(std::string input)
 			{
 				case GameState::Init:
 				{
-					int height = input.find('x') != std::string::npos ? std::stoi(input.substr(0, input.find("x"))) : -1;
-					int width = input.find('x') != std::string::npos ? std::stoi(input.substr(input.find('x') + 1)) : -1;
-
-					if (height <= 0 || width <= 0)
+					// Auto test cases
+					if (input.find('x') == std::string::npos)
+					{
+						int id = std::stoi(input);
+						RunTestCase(id);
 						inputIsValid = false;
+					}
 					else
 					{
-						mHeight = height;
-						mWidth = width;
+						int width = std::stoi(input.substr(0, input.find("x")));
+						int height = std::stoi(input.substr(input.find('x') + 1));
+
+						if (height <= 0 || width <= 0)
+							inputIsValid = false;
+						else
+						{
+							mHeight = height;
+							mWidth = width;
+						}
 					}
 
 					break;
@@ -319,12 +362,27 @@ void Game::ShowBoard()
 	std::string boardString = mNodeManager->GetNodeString();
 	for (int i = 0; i < mHeight; ++i)
 	{
+		std::string line = std::string(mWidth * 2 + 1, '-');
+		std::cout << "  " << line << '\n';
+
 		string sub = boardString.substr(i * mWidth, mWidth);
-		if(mDarkMode)
+
+		int characters = sub.length();
+		for (int j = 0; j < characters; ++j)
+		{
+			sub.insert(j*2, "|");
+		}
+
+		sub.append("|");
+
+		if (mDarkMode)
 			std::replace(sub.begin(), sub.end(), 'x', ' '); // replace all 'x' to ' '
 
 		std::cout << "  " << sub << '\n';
 	}
+
+	std::string lastLine = std::string(mWidth * 2 + 1, '-');
+	std::cout << "  " << lastLine << '\n';
 
 	cout << '\n';
 }
@@ -358,4 +416,16 @@ void Game::ClearScreen()
 	// Assume POSIX
 	std::system("clear");
 #endif
+}
+
+void Game::RunTestCase(int id)
+{
+	std::vector<std::string> inputs = GetTestInputs(id);
+
+	if (inputs.size() != 0)
+	{
+		mTesting = true;
+		mTestingInputs = inputs;
+		mInputItr = mTestingInputs.begin();
+	}
 }
