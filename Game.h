@@ -6,18 +6,12 @@
 
 #include <string>
 
-enum class PlayerInputType
-{
-	BoardSize,
-	PreGame,
-	GameGoing
-};
-
 enum class GameState
 {
 	Init,
 	PreGame,
 	GameGoing,
+	GameEnding,
 	Restarting
 };
 
@@ -30,11 +24,14 @@ public:
 	void StartGame();
 
 private:
+	void ShowRules();
+	void Update();
+
 	void InitBoard();
 	void InitLivingCells();
 	void RunTheGame();
 
-	void GetPlayerInput(PlayerInputType type);
+	bool HandlePlayerInput();
 
 	void NextRound();
 	void ShowBoard();
@@ -50,8 +47,6 @@ private:
 	// Other
 	GameState mGameState = GameState::Init;
 	bool mAutoPlay = false;
-	//bool mGameGoing = false;
-	//bool mRestaring = false;
 
 	int mRound = 0;
 	bool mDarkMode = false;

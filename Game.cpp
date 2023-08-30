@@ -28,107 +28,11 @@ void Game::StartGame()
 	mHeight = 0;
 	mWidth = 0;
 
-	InitBoard();
-
-	if (mGameState != GameState::Restarting)
-		InitLivingCells();
-
-	if (mGameState != GameState::Restarting)
-		RunTheGame();
-
-	if (mGameState == GameState::Restarting)
-		RestartTheGame();
-
-	//ShowBoard();
-
-	//int x = 0;
-	//int y = 0;
-	//int index = 0;
-
-	//bool startGame = false;
-	//while (!startGame)
-	//{
-	//	//cout << "Next type alive nodes (x.y)! Example: 3.1 || Or Start game typing: s"; // Type a number and press enter
-	//	cin >> input; // Get user input from the keyboard
-
-	//	if (input == "s" || input == "n" || input == "r")
-	//		startGame = true;
-	//	else
-	//	{
-	//		x = std::stoi(input.substr(0, input.find("x")));
-	//		y = std::stoi(input.substr(input.find('x') + 1));
-
-	//		mNodeManager->ReviveNode(x, y);
-
-	//		system("cls");
-	//		ShowBoard();
-	//	}
-	//}
-
-	//bool restartGame = false;
-	//bool playing = true;
-	//while (playing)
-	//{
-	//	++mRound;
-
-	//	mNodeManager->AdvanceRound(mRound);
-	//	ShowBoard();
-	//	if (input != "s")
-	//	{
-	//		cin >> input; // Get user input from the keyboard
-
-	//		if (input == "r")
-	//		{
-	//			playing = false;
-	//			restartGame = true;
-	//		}
-	//		else if (input == "d")
-	//		{
-	//			
-	//			mDarkMode = true;
-	//		}
-	//	}
-	//	else
-	//	{
-	//		sleep_for(nanoseconds(100000000));
-	//		system("cls");
-	//	}
-	//}
-
-	//if (restartGame)
-	//{
-	//	ClearGame();
-
-	//	system("cls");
-	//	StartGame();
-	//}
+	ShowRules();
+	Update();
 }
 
-void Game::InitBoard()
-{
-	cout << "------------------------------------------" << '\n';
-	cout << "|              Game Of Life              |" << '\n';
-	cout << "------------------------------------------" << '\n' << '\n';
-
-	cout << "Inputs:" << '\n';
-	cout << "- r => Restarts the game" << '\n' << '\n';
-
-	cout << "Init Board Size" << '\n';
-	cout << "- Input: Heigh x Width (Example: 3x5)" << '\n';
-	cout << "- Both numbers need to be positive numbers" << '\n' << '\n';
-
-	while (mGameState == GameState::Init)
-	{
-		cout << "Board Size: ";
-		GetPlayerInput(PlayerInputType::BoardSize);
-	}
-
-	mNodeManager = new NodeManager(mHeight, mWidth);
-
-	system("cls");
-}
-
-void Game::InitLivingCells()
+void Game::ShowRules()
 {
 	cout << "------------------------------------------" << '\n';
 	cout << "|              Game Of Life              |" << '\n';
@@ -138,69 +42,106 @@ void Game::InitLivingCells()
 	cout << "- r => Restarts the game" << '\n';
 	cout << "- s => Starts the game" << '\n';
 	cout << "- d => Hides dead cells" << '\n';
+	cout << "- a => Start automatic stage changing" << '\n';
+	cout << "- n => Move to next stage" << '\n';
+	cout << "- e => End the game" << '\n' << '\n';
 
-	cout << '\n' << "Init living cells" << '\n';
+	cout << "Board Size" << '\n';
+	cout << "- Input: Heigh x Width (Example: 3x5)" << '\n';
+	cout << "- Both numbers need to be positive numbers" << '\n';
+
+	cout << '\n' << "Living cells" << '\n';
 	cout << "- Input: posX x posY (Example: 3x5)" << '\n';
 	cout << "- Both numbers need to be inside game board" << '\n';
-	cout << "- NOTE: Top left corner is 0x0 and bottom right corner is " <<
-		std::to_string(mHeight) << "x" << std::to_string(mWidth) << '\n';
+	cout << "- NOTE: Indexes starts from 0 so in 3x3 board top left corner is 0x0 and bottom right corner is 2x2" << '\n' << '\n';
+	//	std::to_string(2) << "x" << std::to_string(mWidth) << '\n';
+}
 
+void Game::Update()
+{
+	bool playing = true;
+	while (playing)
+	{
+		switch (mGameState)
+		{
+			case GameState::Init:
+			{
+				InitBoard();
+				break;
+			}
+			case GameState::PreGame:
+			{
+				InitLivingCells();
+				break;
+			}
+			case GameState::GameGoing:
+			{
+				RunTheGame();
+				break;
+			}
+			case GameState::GameEnding:
+			{
+				playing = false;
+				break;
+			}
+			case GameState::Restarting:
+			{
+				ClearGame();
+				ShowRules();
+				break;
+			}
+			default:
+				break;
+		}
+	}
+}
+
+void Game::InitBoard()
+{
+	cout << "Board Size: ";
+	bool success = HandlePlayerInput();
+
+	if (success)
+	{
+		mGameState = GameState::PreGame;
+		mNodeManager = new NodeManager(mHeight, mWidth);
+		//system("cls");
+	}
+}
+
+void Game::InitLivingCells()
+{
 	ShowBoard();
 
-	while (mGameState == GameState::PreGame)
-	{
-		cout << "Cordinates for a living cell: ";
-		GetPlayerInput(PlayerInputType::PreGame);
-	}
+	cout << "Cordinates for a living cell: ";
+	bool success = HandlePlayerInput();
 
-	system("cls");
+	//system("cls");
 }
 
 void Game::RunTheGame()
 {
-	cout << "------------------------------------------" << '\n';
-	cout << "|              Game Of Life              |" << '\n';
-	cout << "------------------------------------------" << '\n' << '\n';
-
-	cout << "Inputs:" << '\n';
-	cout << "- r => Restarts the game" << '\n';
-	cout << "- d => Hides dead cells" << '\n';
-	cout << "- a => Start automatic stage changing" << '\n';
-	cout << "- n => Move to next stage" << '\n';
-
 	ShowBoard();
 
-	while (mGameState == GameState::GameGoing)
+	if (mAutoPlay)
 	{
-		if (mAutoPlay)
-		{
-			sleep_for(nanoseconds(100000000));
-			NextRound();
-		}
-		else
-		{
-			cout << "Input: ";
-			GetPlayerInput(PlayerInputType::GameGoing);
-
-			cout << "------------------------------------------" << '\n';
-			cout << "|              Game Of Life              |" << '\n';
-			cout << "------------------------------------------" << '\n' << '\n';
-
-			cout << "Inputs:" << '\n';
-			cout << "- r => Restarts the game" << '\n';
-			cout << "- d => Hides dead cells" << '\n';
-			cout << "- a => Start automatic stage changing" << '\n';
-			cout << "- n => Move to next stage" << '\n';
-		}
+		sleep_for(nanoseconds(100000000));
+		NextRound();
+	}
+	else
+	{
+		cout << "Input: ";
+		HandlePlayerInput();
 	}
 }
 
-void Game::GetPlayerInput(PlayerInputType type)
+bool Game::HandlePlayerInput()
 {
 	std::string input;
 	cin >> input;
 
-	if (input == "d" && mGameState != GameState::Init)
+	bool inputIsValid = true;
+	if (input == "d")
 	{
 		if(mDarkMode)
 			cout << "Revealing empty board markers." << '\n';
@@ -216,17 +157,22 @@ void Game::GetPlayerInput(PlayerInputType type)
 		cout << "Restarting the game" << '\n';
 		mGameState = GameState::Restarting;
 	}
+	else if (input == "e")
+	{
+		cout << "Ending the game" << '\n';
+		mGameState = GameState::GameEnding;
+	}
 	else
 	{
 		bool error = false;
 		try
 		{
-			switch (type)
+			switch (mGameState)
 			{
-				case PlayerInputType::BoardSize:
+				case GameState::Init:
 				{
-					int height = std::stoi(input.substr(0, input.find("x")));
-					int width = std::stoi(input.substr(input.find('x') + 1));
+					int height = input.find('x') != std::string::npos ? std::stoi(input.substr(0, input.find("x"))) : -1;
+					int width = input.find('x') != std::string::npos ? std::stoi(input.substr(input.find('x') + 1)) : -1;
 
 					if (height <= 0 || width <= 0)
 						error = true;
@@ -234,13 +180,11 @@ void Game::GetPlayerInput(PlayerInputType type)
 					{
 						mHeight = height;
 						mWidth = width;
-
-						mGameState = GameState::PreGame;
 					}
 
 					break;
 				}
-				case PlayerInputType::PreGame:
+				case GameState::PreGame:
 				{
 					if (input == "s")
 						mGameState = GameState::GameGoing;
@@ -256,7 +200,7 @@ void Game::GetPlayerInput(PlayerInputType type)
 
 					break;
 				}
-				case PlayerInputType::GameGoing:
+				case GameState::GameGoing:
 				{
 					if (input == "a")
 						mAutoPlay = true;
@@ -278,10 +222,14 @@ void Game::GetPlayerInput(PlayerInputType type)
 
 		if (error)
 		{
-			if (type == PlayerInputType::BoardSize)
+			if(mGameState == GameState::Init)
 				std::cout << "Error: Invalid board size (both needs to be numbers over 0)." << '\n';
+
+			inputIsValid = false;
 		}
 	}
+
+	return inputIsValid;
 }
 
 void Game::NextRound()
@@ -320,6 +268,9 @@ void Game::RestartTheGame()
 
 void Game::ClearGame()
 {
+	mHeight = 0;
+	mWidth = 0;
+
 	delete(mNodeManager);
 	mNodeManager = NULL;
 
