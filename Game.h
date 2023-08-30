@@ -31,12 +31,15 @@ private:
 	void InitLivingCells();
 	void RunTheGame();
 
-	bool HandlePlayerInput();
+	std::string GetPlayerInput();
+	bool HandlePlayerInput(std::string input);
 
 	void NextRound();
 	void ShowBoard();
 	void RestartTheGame();
 	void ClearGame();
+
+	void ClearScreen();
 
 	// Board
 	int mHeight = 0;

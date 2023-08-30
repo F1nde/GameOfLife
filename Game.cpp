@@ -28,37 +28,72 @@ void Game::StartGame()
 	mHeight = 0;
 	mWidth = 0;
 
-	ShowRules();
 	Update();
 }
 
 void Game::ShowRules()
 {
-	cout << "------------------------------------------" << '\n';
-	cout << "|              Game Of Life              |" << '\n';
-	cout << "------------------------------------------" << '\n' << '\n';
+	switch (mGameState)
+	{
+		case GameState::Init:
+		{
+			cout << "------------------------------------------" << '\n';
+			cout << "|              Game Of Life              |" << '\n';
+			cout << "------------------------------------------" << '\n' << '\n';
 
-	cout << "Inputs:" << '\n';
-	cout << "- r => Restarts the game" << '\n';
-	cout << "- s => Starts the game" << '\n';
-	cout << "- d => Hides dead cells" << '\n';
-	cout << "- a => Start automatic stage changing" << '\n';
-	cout << "- n => Move to next stage" << '\n';
-	cout << "- e => End the game" << '\n' << '\n';
+			cout << "Inputs:" << '\n';
+			cout << "- r => Restarts the game" << '\n';
+			cout << "- e => Exit the program" << '\n' << '\n';
 
-	cout << "Board Size" << '\n';
-	cout << "- Input: Heigh x Width (Example: 3x5)" << '\n';
-	cout << "- Both numbers need to be positive numbers" << '\n';
+			cout << "Board Size" << '\n';
+			cout << "- Input: Heigh x Width (Example: 3x5)" << '\n';
+			cout << "- Both numbers need to be positive numbers" << '\n' << '\n';
+			break;
+		}
+		case GameState::PreGame:
+		{
+			cout << "------------------------------------------" << '\n';
+			cout << "|              Game Of Life              |" << '\n';
+			cout << "------------------------------------------" << '\n' << '\n';
 
-	cout << '\n' << "Living cells" << '\n';
-	cout << "- Input: posX x posY (Example: 3x5)" << '\n';
-	cout << "- Both numbers need to be inside game board" << '\n';
-	cout << "- NOTE: Indexes starts from 0 so in 3x3 board top left corner is 0x0 and bottom right corner is 2x2" << '\n' << '\n';
-	//	std::to_string(2) << "x" << std::to_string(mWidth) << '\n';
+			cout << "Inputs:" << '\n';
+			cout << "- r => Restarts the game" << '\n';
+			cout << "- e => Exit the program" << '\n';
+			cout << "- s => Starts the game" << '\n';
+			cout << "- d => Hides dead cells" << '\n' << '\n';
+
+			cout << "Living cells" << '\n';
+			cout << "- Input: posX x posY (Example: 3x5)" << '\n';
+			cout << "- Both numbers need to be inside game board" << '\n';
+			cout << "- NOTE: Indexes starts from 0 so in 3x3 board top left corner is 0x0 and bottom right corner is 2x2" << '\n';
+
+			break;
+		}
+		case GameState::GameGoing:
+		{
+			cout << "Inputs:" << '\n';
+			cout << "- r => Restarts the game" << '\n';
+			cout << "- e => Exit the program" << '\n';
+			cout << "- d => Hides dead cells" << '\n';
+			cout << "- a => Start automatic stage changing" << '\n';
+			cout << "- n => Move to next stage" << '\n' << '\n';
+
+			break;
+		}
+		case GameState::GameEnding:
+			break;
+		case GameState::Restarting:
+			break;
+		default:
+			break;
+	}
 }
 
+// State machine
 void Game::Update()
 {
+	bool initRulesShown = false;
+	bool pregameRulesShown = false;
 	bool playing = true;
 	while (playing)
 	{
@@ -66,11 +101,25 @@ void Game::Update()
 		{
 			case GameState::Init:
 			{
+				if (!initRulesShown)
+				{
+					ClearScreen();
+					ShowRules();
+					initRulesShown = true;
+				}
+
 				InitBoard();
 				break;
 			}
 			case GameState::PreGame:
 			{
+				if (!pregameRulesShown)
+				{
+					ClearScreen();
+					ShowRules();
+					pregameRulesShown = true;
+				}
+
 				InitLivingCells();
 				break;
 			}
@@ -88,6 +137,10 @@ void Game::Update()
 			{
 				ClearGame();
 				ShowRules();
+
+				initRulesShown = false;
+				pregameRulesShown = false;
+
 				break;
 			}
 			default:
@@ -99,13 +152,14 @@ void Game::Update()
 void Game::InitBoard()
 {
 	cout << "Board Size: ";
-	bool success = HandlePlayerInput();
 
-	if (success)
+	std::string input = GetPlayerInput();
+	bool success = HandlePlayerInput(input);
+
+	if (success && mGameState == GameState::Init)
 	{
 		mGameState = GameState::PreGame;
 		mNodeManager = new NodeManager(mHeight, mWidth);
-		//system("cls");
 	}
 }
 
@@ -114,13 +168,15 @@ void Game::InitLivingCells()
 	ShowBoard();
 
 	cout << "Cordinates for a living cell: ";
-	bool success = HandlePlayerInput();
 
-	//system("cls");
+	std::string input = GetPlayerInput();
+	bool success = HandlePlayerInput(input);
 }
 
 void Game::RunTheGame()
 {
+	ClearScreen();
+
 	ShowBoard();
 
 	if (mAutoPlay)
@@ -130,29 +186,25 @@ void Game::RunTheGame()
 	}
 	else
 	{
+		ShowRules();
 		cout << "Input: ";
-		HandlePlayerInput();
+		std::string input = GetPlayerInput();
+		HandlePlayerInput(input);
 	}
 }
 
-bool Game::HandlePlayerInput()
+std::string Game::GetPlayerInput()
 {
 	std::string input;
 	cin >> input;
 
+	return input;
+}
+
+bool Game::HandlePlayerInput(std::string input)
+{
 	bool inputIsValid = true;
-	if (input == "d")
-	{
-		if(mDarkMode)
-			cout << "Revealing empty board markers." << '\n';
-		else
-			cout << "Hiding empty board markers." << '\n';
-
-		mDarkMode = !mDarkMode;
-
-		ShowBoard();
-	}
-	else if (input == "r")
+	if (input == "r")
 	{
 		cout << "Restarting the game" << '\n';
 		mGameState = GameState::Restarting;
@@ -162,9 +214,43 @@ bool Game::HandlePlayerInput()
 		cout << "Ending the game" << '\n';
 		mGameState = GameState::GameEnding;
 	}
-	else
+	else if (input == "d")
 	{
-		bool error = false;
+		if (mGameState != GameState::Init)
+		{
+			if (mDarkMode)
+				cout << "Revealing empty board markers." << '\n';
+			else
+				cout << "Hiding empty board markers." << '\n';
+
+			mDarkMode = !mDarkMode;
+		}
+		else
+			inputIsValid = false;
+	}
+	else if (input == "s")
+	{
+		if(mGameState == GameState::PreGame)
+			mGameState = GameState::GameGoing;
+		else
+			inputIsValid = false;
+	}
+	else if (input == "a")
+	{
+		if (mGameState == GameState::GameGoing)
+			mAutoPlay = true;
+		else
+			inputIsValid = false;
+	}
+	else if(input == "n")
+	{
+		if (mGameState == GameState::GameGoing)
+			NextRound();
+		else
+			inputIsValid = false;
+	}
+	else // Cordinates input
+	{
 		try
 		{
 			switch (mGameState)
@@ -175,7 +261,7 @@ bool Game::HandlePlayerInput()
 					int width = input.find('x') != std::string::npos ? std::stoi(input.substr(input.find('x') + 1)) : -1;
 
 					if (height <= 0 || width <= 0)
-						error = true;
+						inputIsValid = false;
 					else
 					{
 						mHeight = height;
@@ -186,47 +272,32 @@ bool Game::HandlePlayerInput()
 				}
 				case GameState::PreGame:
 				{
-					if (input == "s")
-						mGameState = GameState::GameGoing;
+					int x = input.find('x') != std::string::npos ? std::stoi(input.substr(0, input.find("x"))) : -1;
+					int y = input.find('x') != std::string::npos ? std::stoi(input.substr(input.find('x') + 1)) : -1;
+
+					if (x < 0 || y < 0 || x > mWidth - 1 || y > mHeight - 1)
+						inputIsValid = false;
 					else
-					{
-						int x = std::stoi(input.substr(0, input.find("x")));
-						int y = std::stoi(input.substr(input.find('x') + 1));
-
 						mNodeManager->ReviveNode(x, y);
-
-						ShowBoard();
-					}
 
 					break;
 				}
-				case GameState::GameGoing:
-				{
-					if (input == "a")
-						mAutoPlay = true;
-					else if (input == "n")
-					{
-						NextRound();
-					}
-				}
 				default:
-				{
-					// code block
-				}
+					break;
 			}
 		}
 		catch (std::invalid_argument const& ex)
 		{
-			error = true;
-		}
-
-		if (error)
-		{
-			if(mGameState == GameState::Init)
-				std::cout << "Error: Invalid board size (both needs to be numbers over 0)." << '\n';
-
 			inputIsValid = false;
 		}
+	}
+
+	if (!inputIsValid)
+	{
+		if (mGameState == GameState::Init)
+			std::cout << "Error: Invalid board size (both needs to be numbers over 0)." << '\n';
+		else if (mGameState == GameState::PreGame)
+			std::cout << "Error: Invalid cordinates (cordinates are not inside the game board)." << '\n';
 	}
 
 	return inputIsValid;
@@ -237,7 +308,7 @@ void Game::NextRound()
 	++mRound;
 	mNodeManager->AdvanceRound(mRound);
 
-	system("cls");
+	ClearScreen();
 	ShowBoard();
 }
 
@@ -261,8 +332,6 @@ void Game::ShowBoard()
 void Game::RestartTheGame()
 {
 	ClearGame();
-
-	system("cls");
 	StartGame();
 }
 
@@ -278,5 +347,15 @@ void Game::ClearGame()
 	mAutoPlay = false;
 
 	mGameState = GameState::Init;
-	system("cls");
+	ClearScreen();
+}
+
+void Game::ClearScreen()
+{
+#ifdef _WIN32
+	std::system("cls");
+#else
+	// Assume POSIX
+	std::system("clear");
+#endif
 }
