@@ -33,14 +33,26 @@ bool Node::IsAlive()
 	return (GetState() == State::Alive || GetState() == State::WillStayAlive);
 }
 
+bool Node::IsAlreadyCheckedThisRound(int round)
+{
+	if (mCurrentRound != round)
+		return false;
+	else
+	{
+		return (GetState() == State::WaitingForRevive
+			|| GetState() == State::WillStayAlive
+			|| GetState() == State::WillStayDead);
+	}
+}
+
+// TODO: Rename this
 std::vector<Node*> Node::GetRevivableNeighbours(int round)
 {
 	std::vector<Node*> revivableNodes;
 
 	for (int i = 0; i < mNeighbors.size(); ++i)
 	{
-		if (mNeighbors[i]->GetState() != State::WaitingForRevive
-			&& mNeighbors[i]->GetState() != State::WillStayAlive)
+		if (!mNeighbors[i]->IsAlreadyCheckedThisRound(round))
 		{
 			bool alive = mNeighbors[i]->IsAliveNextRound(round);
 			if (alive)
@@ -57,6 +69,10 @@ bool Node::IsAliveNextRound(int round)
 	// -> current data is already valid
 	if (mCurrentRound != round)
 	{
+		// NOTE: This state is not cleared by the Nodemanager
+		if (mCurrentState == State::WillStayDead)
+			mCurrentState = State::Dead;
+
 		mCurrentRound = round;
 		mIsAliveAfterThisRound = false;
 
@@ -94,6 +110,8 @@ bool Node::IsAliveNextRound(int round)
 
 		if (mCurrentState == State::Dead && mIsAliveAfterThisRound)
 			mCurrentState = State::WaitingForRevive;
+		else if (mCurrentState == State::Dead && !mIsAliveAfterThisRound)
+			mCurrentState = State::WillStayDead;
 		else if (mCurrentState == State::Alive && mIsAliveAfterThisRound)
 			mCurrentState = State::WillStayAlive;
 	}
