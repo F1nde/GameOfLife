@@ -13,33 +13,42 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Header Files\Game">
+      <UniqueIdentifier>{36ee876f-92f3-49b2-ae0e-42ab425cbc9a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Game">
+      <UniqueIdentifier>{71360503-9378-40d4-aebc-e07cf708c52e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Testing">
+      <UniqueIdentifier>{af09e383-c7eb-4bc8-a0c9-cdd7d9d2d782}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Main.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="source\game\Game.cpp">
+      <Filter>Source Files\Game</Filter>
     </ClCompile>
-    <ClCompile Include="Game.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="source\game\Main.cpp">
+      <Filter>Source Files\Game</Filter>
     </ClCompile>
-    <ClCompile Include="Node.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="source\game\Node.cpp">
+      <Filter>Source Files\Game</Filter>
     </ClCompile>
-    <ClCompile Include="NodeManager.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="source\game\NodeManager.cpp">
+      <Filter>Source Files\Game</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Game.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="source\game\Game.h">
+      <Filter>Header Files\Game</Filter>
     </ClInclude>
-    <ClInclude Include="Node.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="source\game\Node.h">
+      <Filter>Header Files\Game</Filter>
     </ClInclude>
-    <ClInclude Include="NodeManager.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="source\game\NodeManager.h">
+      <Filter>Header Files\Game</Filter>
     </ClInclude>
-    <ClInclude Include="TestInputs.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="source\testing\TestInputs.h">
+      <Filter>Header Files\Testing</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

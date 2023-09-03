@@ -1,7 +1,7 @@
 
 #include "Game.h"
 #include "NodeManager.h"
-#include "TestInputs.h"
+#include "../Testing/TestInputs.h"
 
 #include <stdlib.h>
 #include <algorithm>
@@ -17,11 +17,36 @@ using std::string;
 using namespace std::this_thread;
 using namespace std::chrono;
 
-Game::Game(){}
+struct GameProperties
+{
+	// Board size
+	int mHeight = 0;
+	int mWidth = 0;
+
+	// Node Management
+	NodeManager* mNodeManager = NULL;
+
+	// Game properties
+	GameState mGameState = GameState::Init;
+	bool mAutoPlay = false;
+	int mRound = 0;
+	//bool mDarkMode = false;
+
+	// Auto testing
+	bool mTestingMode = false;
+	std::vector<std::string>::iterator mInputItr;
+	std::vector<std::string> mTestingInputs;
+};
+
+Game::Game()
+{
+	mGameProperties = new GameProperties();
+}
 
 Game::~Game()
 {
-	ClearGame();
+	delete(mNodeManager);
+	mNodeManager = NULL;
 }
 
 void Game::StartGame()
@@ -56,7 +81,7 @@ void Game::ShowRules()
 			cout << "- 11 => Glider" << '\n';
 			cout << "- 12 => Light-weight spaceship" << '\n';
 			cout << "- 13 => Middle-weight spaceship" << '\n';
-			cout << "- 14 => Heavy-weight spaceship" << '\n';
+			cout << "- 14 => Heavy-weight spaceship" << '\n' << '\n';
 
 			cout << "Inputs:" << '\n';
 			cout << "- r => Restarts the game" << '\n';
@@ -77,7 +102,7 @@ void Game::ShowRules()
 			cout << "- r => Restarts the game" << '\n';
 			cout << "- e => Exit the program" << '\n';
 			cout << "- s => Starts the game" << '\n';
-			cout << "- d => Hides dead cells" << '\n' << '\n';
+			//cout << "- d => Hides dead cells" << '\n' << '\n';
 
 			cout << "Living cells" << '\n';
 			cout << "- Input: posX x posY (Example: 3x5)" << '\n';
@@ -86,12 +111,12 @@ void Game::ShowRules()
 
 			break;
 		}
-		case GameState::GameGoing:
+		case GameState::GameRunning:
 		{
 			cout << "Inputs:" << '\n';
 			cout << "- r => Restarts the game" << '\n';
 			cout << "- e => Exit the program" << '\n';
-			cout << "- d => Hides dead cells" << '\n';
+			//cout << "- d => Hides dead cells" << '\n';
 			cout << "- a => Start automatic stage changing" << '\n';
 			cout << "- n => Move to next stage" << '\n' << '\n';
 
@@ -106,7 +131,6 @@ void Game::ShowRules()
 	}
 }
 
-// State machine
 void Game::Update()
 {
 	bool initRulesShown = false;
@@ -130,7 +154,7 @@ void Game::Update()
 			}
 			case GameState::PreGame:
 			{
-				if (!pregameRulesShown && !mTesting)
+				if (!pregameRulesShown && !mTestingMode)
 				{
 					ClearScreen();
 					ShowRules();
@@ -140,7 +164,7 @@ void Game::Update()
 				InitLivingCells();
 				break;
 			}
-			case GameState::GameGoing:
+			case GameState::GameRunning:
 			{
 				RunTheGame();
 				break;
@@ -152,7 +176,7 @@ void Game::Update()
 			}
 			case GameState::Restarting:
 			{
-				ClearGame();
+				ResetGame();
 				ShowRules();
 
 				initRulesShown = false;
@@ -182,7 +206,7 @@ void Game::InitBoard()
 
 void Game::InitLivingCells()
 {
-	if (!mTesting)
+	if (!mTestingMode)
 	{
 		ShowBoard();
 		cout << "Cordinates for a living cell: ";
@@ -215,7 +239,7 @@ std::string Game::GetPlayerInput()
 {
 	std::string input = "";
 
-	if (mTesting)
+	if (mTestingMode)
 	{
 		if (mInputItr != mTestingInputs.end())
 		{
@@ -223,7 +247,7 @@ std::string Game::GetPlayerInput()
 			++mInputItr;
 		}
 		else
-			mTesting = false;
+			mTestingMode = false;
 	}
 
 	if(input == "")
@@ -245,37 +269,37 @@ bool Game::HandlePlayerInput(std::string input)
 		cout << "Ending the game" << '\n';
 		mGameState = GameState::GameEnding;
 	}
-	else if (input == "d")
-	{
-		if (mGameState != GameState::Init)
-		{
-			if (mDarkMode)
-				cout << "Revealing empty board markers." << '\n';
-			else
-				cout << "Hiding empty board markers." << '\n';
+	//else if (input == "d")
+	//{
+	//	if (mGameState != GameState::Init)
+	//	{
+	//		if (mDarkMode)
+	//			cout << "Revealing empty board markers." << '\n';
+	//		else
+	//			cout << "Hiding empty board markers." << '\n';
 
-			mDarkMode = !mDarkMode;
-		}
-		else
-			inputIsValid = false;
-	}
+	//		mDarkMode = !mDarkMode;
+	//	}
+	//	else
+	//		inputIsValid = false;
+	//}
 	else if (input == "s")
 	{
 		if(mGameState == GameState::PreGame)
-			mGameState = GameState::GameGoing;
+			mGameState = GameState::GameRunning;
 		else
 			inputIsValid = false;
 	}
 	else if (input == "a")
 	{
-		if (mGameState == GameState::GameGoing)
+		if (mGameState == GameState::GameRunning)
 			mAutoPlay = true;
 		else
 			inputIsValid = false;
 	}
 	else if(input == "n")
 	{
-		if (mGameState == GameState::GameGoing)
+		if (mGameState == GameState::GameRunning)
 			NextRound();
 		else
 			inputIsValid = false;
@@ -373,7 +397,7 @@ void Game::ShowBoard()
 
 		sub.append("|");
 
-		if (mDarkMode)
+		//if (mDarkMode)
 			std::replace(sub.begin(), sub.end(), 'x', ' '); // replace all 'x' to ' '
 
 		std::cout << "  " << sub << '\n';
@@ -385,13 +409,7 @@ void Game::ShowBoard()
 	cout << '\n';
 }
 
-void Game::RestartTheGame()
-{
-	ClearGame();
-	StartGame();
-}
-
-void Game::ClearGame()
+void Game::ResetGame()
 {
 	mHeight = 0;
 	mWidth = 0;
@@ -399,7 +417,7 @@ void Game::ClearGame()
 	delete(mNodeManager);
 	mNodeManager = NULL;
 
-	mDarkMode = false;
+	//mDarkMode = false;
 	mAutoPlay = false;
 
 	mGameState = GameState::Init;
@@ -423,7 +441,7 @@ void Game::RunTestCase(int id)
 
 	if (inputs.size() != 0)
 	{
-		mTesting = true;
+		mTestingMode = true;
 		mTestingInputs = inputs;
 		mInputItr = mTestingInputs.begin();
 	}

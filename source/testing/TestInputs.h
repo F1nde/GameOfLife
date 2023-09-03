@@ -173,7 +173,7 @@ std::vector<std::string> GetTestInputs(int id)
 	if (inputs.size() != 0)
 	{
 		inputs.push_back("s");
-		inputs.push_back("d");
+		//inputs.push_back("d");
 	}
 
 	return inputs;
