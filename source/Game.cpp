@@ -1,7 +1,7 @@
 
 #include "Game.h"
 #include "NodeManager.h"
-#include "../Testing/TestInputs.h"
+#include "TestInputs.h"
 
 #include <stdlib.h>
 #include <algorithm>

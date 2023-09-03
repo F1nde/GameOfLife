@@ -19,17 +19,17 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="source\game\Game.cpp" />
-    <ClCompile Include="source\game\Main.cpp" />
-    <ClCompile Include="source\game\Node.cpp" />
-    <ClCompile Include="source\game\NodeManager.cpp" />
+    <ClCompile Include="source\Game.cpp" />
+    <ClCompile Include="source\Main.cpp" />
+    <ClCompile Include="source\Node.cpp" />
+    <ClCompile Include="source\NodeManager.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="source\game\DisableCopy.h" />
-    <ClInclude Include="source\game\Game.h" />
-    <ClInclude Include="source\game\Node.h" />
-    <ClInclude Include="source\game\NodeManager.h" />
-    <ClInclude Include="source\testing\TestInputs.h" />
+    <ClInclude Include="source\DisableCopy.h" />
+    <ClInclude Include="source\Game.h" />
+    <ClInclude Include="source\Node.h" />
+    <ClInclude Include="source\NodeManager.h" />
+    <ClInclude Include="source\TestInputs.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
