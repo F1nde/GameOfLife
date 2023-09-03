@@ -3,7 +3,7 @@
 
 struct NodeProperties
 {
-	int mNodeId;
+	int mNodeId = 0;
 	NodeState mCurrentState = NodeState::Dead;
 	std::vector<Node*> mNeighbors = std::vector<Node*>();
 

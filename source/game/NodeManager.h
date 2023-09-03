@@ -3,7 +3,6 @@
 #define __NODEMANAGER_H__
 
 #include "DisableCopy.h"
-#include "Node.h"
 
 #include <string>
 

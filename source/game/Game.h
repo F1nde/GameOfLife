@@ -3,7 +3,6 @@
 #define __GAME_H__
 
 #include "DisableCopy.h"
-#include "Nodemanager.h"
 
 #include <string>
 
