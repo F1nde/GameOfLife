@@ -1,6 +1,8 @@
 
 #include "Node.h"
 
+#include <cstddef>
+
 struct NodeProperties
 {
 	int mNodeId = 0;
@@ -21,7 +23,9 @@ Node::Node(int id)
 Node::~Node()
 {
 	for (int i = 0; i < mProperties->mNeighbors.size(); ++i)
+	{
 		mProperties->mNeighbors[i] = NULL;
+	}
 }
 
 void Node::Init(std::vector<Node*> neighbors)
