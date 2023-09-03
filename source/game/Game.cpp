@@ -26,13 +26,16 @@ struct GameProperties
 	// Node Management
 	NodeManager* mNodeManager = NULL;
 
-	// Game properties
+	// Current game state
 	GameState mGameState = GameState::Init;
-	bool mAutoPlay = false;
-	int mRound = 0;
-	//bool mDarkMode = false;
 
-	// Auto testing
+	// Determines if game waits for player input when advancing game rounds.
+	bool mAutoPlay = false;
+
+	// Current round number.
+	int mRound = 0;
+
+	// Auto testing mode + inputs
 	bool mTestingMode = false;
 	std::vector<std::string>::iterator mInputItr;
 	std::vector<std::string> mTestingInputs;
@@ -40,26 +43,27 @@ struct GameProperties
 
 Game::Game()
 {
-	mGameProperties = new GameProperties();
+	mGameProperties = NULL;
 }
 
 Game::~Game()
 {
-	delete(mNodeManager);
-	mNodeManager = NULL;
+	delete(mGameProperties->mNodeManager);
+	mGameProperties->mNodeManager = NULL;
+
+	delete(mGameProperties);
+	mGameProperties = NULL;
 }
 
 void Game::StartGame()
 {
-	mHeight = 0;
-	mWidth = 0;
-
+	mGameProperties = new GameProperties();
 	Update();
 }
 
 void Game::ShowRules()
 {
-	switch (mGameState)
+	switch (mGameProperties->mGameState)
 	{
 		case GameState::Init:
 		{
@@ -102,7 +106,6 @@ void Game::ShowRules()
 			cout << "- r => Restarts the game" << '\n';
 			cout << "- e => Exit the program" << '\n';
 			cout << "- s => Starts the game" << '\n';
-			//cout << "- d => Hides dead cells" << '\n' << '\n';
 
 			cout << "Living cells" << '\n';
 			cout << "- Input: posX x posY (Example: 3x5)" << '\n';
@@ -116,7 +119,6 @@ void Game::ShowRules()
 			cout << "Inputs:" << '\n';
 			cout << "- r => Restarts the game" << '\n';
 			cout << "- e => Exit the program" << '\n';
-			//cout << "- d => Hides dead cells" << '\n';
 			cout << "- a => Start automatic stage changing" << '\n';
 			cout << "- n => Move to next stage" << '\n' << '\n';
 
@@ -138,7 +140,7 @@ void Game::Update()
 	bool playing = true;
 	while (playing)
 	{
-		switch (mGameState)
+		switch (mGameProperties->mGameState)
 		{
 			case GameState::Init:
 			{
@@ -154,7 +156,7 @@ void Game::Update()
 			}
 			case GameState::PreGame:
 			{
-				if (!pregameRulesShown && !mTestingMode)
+				if (!pregameRulesShown && !mGameProperties->mTestingMode)
 				{
 					ClearScreen();
 					ShowRules();
@@ -197,16 +199,16 @@ void Game::InitBoard()
 	std::string input = GetPlayerInput();
 	bool success = HandlePlayerInput(input);
 
-	if (success && mGameState == GameState::Init)
+	if (success && mGameProperties->mGameState == GameState::Init)
 	{
-		mGameState = GameState::PreGame;
-		mNodeManager = new NodeManager(mHeight, mWidth);
+		mGameProperties->mGameState = GameState::PreGame;
+		mGameProperties->mNodeManager = new NodeManager(mGameProperties->mWidth, mGameProperties->mHeight);
 	}
 }
 
 void Game::InitLivingCells()
 {
-	if (!mTestingMode)
+	if (!mGameProperties->mTestingMode)
 	{
 		ShowBoard();
 		cout << "Cordinates for a living cell: ";
@@ -221,7 +223,7 @@ void Game::RunTheGame()
 	ClearScreen();
 	ShowBoard();
 
-	if (mAutoPlay)
+	if (mGameProperties->mAutoPlay)
 	{
 		NextRound();
 		sleep_for(nanoseconds(100000000));
@@ -239,15 +241,15 @@ std::string Game::GetPlayerInput()
 {
 	std::string input = "";
 
-	if (mTestingMode)
+	if (mGameProperties->mTestingMode)
 	{
-		if (mInputItr != mTestingInputs.end())
+		if (mGameProperties->mInputItr != mGameProperties->mTestingInputs.end())
 		{
-			input = *mInputItr;
-			++mInputItr;
+			input = *mGameProperties->mInputItr;
+			++mGameProperties->mInputItr;
 		}
 		else
-			mTestingMode = false;
+			mGameProperties->mTestingMode = false;
 	}
 
 	if(input == "")
@@ -262,44 +264,30 @@ bool Game::HandlePlayerInput(std::string input)
 	if (input == "r")
 	{
 		cout << "Restarting the game" << '\n';
-		mGameState = GameState::Restarting;
+		mGameProperties->mGameState = GameState::Restarting;
 	}
 	else if (input == "e")
 	{
 		cout << "Ending the game" << '\n';
-		mGameState = GameState::GameEnding;
+		mGameProperties->mGameState = GameState::GameEnding;
 	}
-	//else if (input == "d")
-	//{
-	//	if (mGameState != GameState::Init)
-	//	{
-	//		if (mDarkMode)
-	//			cout << "Revealing empty board markers." << '\n';
-	//		else
-	//			cout << "Hiding empty board markers." << '\n';
-
-	//		mDarkMode = !mDarkMode;
-	//	}
-	//	else
-	//		inputIsValid = false;
-	//}
 	else if (input == "s")
 	{
-		if(mGameState == GameState::PreGame)
-			mGameState = GameState::GameRunning;
+		if(mGameProperties->mGameState == GameState::PreGame)
+			mGameProperties->mGameState = GameState::GameRunning;
 		else
 			inputIsValid = false;
 	}
 	else if (input == "a")
 	{
-		if (mGameState == GameState::GameRunning)
-			mAutoPlay = true;
+		if (mGameProperties->mGameState == GameState::GameRunning)
+			mGameProperties->mAutoPlay = true;
 		else
 			inputIsValid = false;
 	}
 	else if(input == "n")
 	{
-		if (mGameState == GameState::GameRunning)
+		if (mGameProperties->mGameState == GameState::GameRunning)
 			NextRound();
 		else
 			inputIsValid = false;
@@ -308,7 +296,7 @@ bool Game::HandlePlayerInput(std::string input)
 	{
 		try
 		{
-			switch (mGameState)
+			switch (mGameProperties->mGameState)
 			{
 				case GameState::Init:
 				{
@@ -328,8 +316,8 @@ bool Game::HandlePlayerInput(std::string input)
 							inputIsValid = false;
 						else
 						{
-							mHeight = height;
-							mWidth = width;
+							mGameProperties->mHeight = height;
+							mGameProperties->mWidth = width;
 						}
 					}
 
@@ -340,10 +328,10 @@ bool Game::HandlePlayerInput(std::string input)
 					int x = input.find('x') != std::string::npos ? std::stoi(input.substr(0, input.find("x"))) : -1;
 					int y = input.find('x') != std::string::npos ? std::stoi(input.substr(input.find('x') + 1)) : -1;
 
-					if (x < 0 || y < 0 || x > mWidth - 1 || y > mHeight - 1)
+					if (x < 0 || y < 0 || x > mGameProperties->mWidth - 1 || y > mGameProperties->mHeight - 1)
 						inputIsValid = false;
 					else
-						mNodeManager->ReviveNode(x, y);
+						mGameProperties->mNodeManager->ReviveNode(x, y);
 
 					break;
 				}
@@ -359,9 +347,9 @@ bool Game::HandlePlayerInput(std::string input)
 
 	if (!inputIsValid)
 	{
-		if (mGameState == GameState::Init)
+		if (mGameProperties->mGameState == GameState::Init)
 			std::cout << "Error: Invalid board size (both needs to be numbers over 0)." << '\n';
-		else if (mGameState == GameState::PreGame)
+		else if (mGameProperties->mGameState == GameState::PreGame)
 			std::cout << "Error: Invalid cordinates (cordinates are not inside the game board)." << '\n';
 	}
 
@@ -370,24 +358,25 @@ bool Game::HandlePlayerInput(std::string input)
 
 void Game::NextRound()
 {
-	++mRound;
-	mNodeManager->AdvanceRound(mRound);
+	++mGameProperties->mRound;
+	mGameProperties->mNodeManager->AdvanceRound(mGameProperties->mRound);
 
 	ClearScreen();
 	ShowBoard();
 }
 
+// TODO: Selkeytä
 void Game::ShowBoard()
 {
 	cout << '\n';
 
-	std::string boardString = mNodeManager->GetNodeString();
-	for (int i = 0; i < mHeight; ++i)
+	std::string boardString = mGameProperties->mNodeManager->GetNodeString();
+	for (int i = 0; i < mGameProperties->mHeight; ++i)
 	{
-		std::string line = std::string(mWidth * 2 + 1, '-');
+		std::string line = std::string(mGameProperties->mWidth * 2 + 1, '-');
 		std::cout << "  " << line << '\n';
 
-		string sub = boardString.substr(i * mWidth, mWidth);
+		string sub = boardString.substr(i * mGameProperties->mWidth, mGameProperties->mWidth);
 
 		int characters = sub.length();
 		for (int j = 0; j < characters; ++j)
@@ -396,14 +385,12 @@ void Game::ShowBoard()
 		}
 
 		sub.append("|");
-
-		//if (mDarkMode)
-			std::replace(sub.begin(), sub.end(), 'x', ' '); // replace all 'x' to ' '
+		std::replace(sub.begin(), sub.end(), 'x', ' '); // replace all 'x' to ' '
 
 		std::cout << "  " << sub << '\n';
 	}
 
-	std::string lastLine = std::string(mWidth * 2 + 1, '-');
+	std::string lastLine = std::string(mGameProperties->mWidth * 2 + 1, '-');
 	std::cout << "  " << lastLine << '\n';
 
 	cout << '\n';
@@ -411,17 +398,12 @@ void Game::ShowBoard()
 
 void Game::ResetGame()
 {
-	mHeight = 0;
-	mWidth = 0;
+	delete(mGameProperties->mNodeManager);
+	mGameProperties->mNodeManager = NULL;
 
-	delete(mNodeManager);
-	mNodeManager = NULL;
+	delete(mGameProperties);
+	mGameProperties = NULL;
 
-	//mDarkMode = false;
-	mAutoPlay = false;
-
-	mGameState = GameState::Init;
-	mRound = 0;
 	ClearScreen();
 }
 
@@ -441,8 +423,8 @@ void Game::RunTestCase(int id)
 
 	if (inputs.size() != 0)
 	{
-		mTestingMode = true;
-		mTestingInputs = inputs;
-		mInputItr = mTestingInputs.begin();
+		mGameProperties->mTestingMode = true;
+		mGameProperties->mTestingInputs = inputs;
+		mGameProperties->mInputItr = mGameProperties->mTestingInputs.begin();
 	}
 }

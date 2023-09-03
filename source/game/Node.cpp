@@ -1,62 +1,80 @@
 
 #include "Node.h"
 
+struct NodeProperties
+{
+	int mNodeId;
+	NodeState mCurrentState = NodeState::Dead;
+	std::vector<Node*> mNeighbors = std::vector<Node*>();
+
+	// This round
+	int mCurrentRound = 0;
+	bool mIsAliveAfterThisRound = true;
+};
+
 Node::Node(int id)
 {
-	mNodeId = id;
+	mProperties = new NodeProperties;
+	mProperties->mNodeId = id;
 }
 
 Node::~Node()
 {
-	for (int i = 0; i < mNeighbors.size(); ++i)
-		mNeighbors[i] = NULL;
+	for (int i = 0; i < mProperties->mNeighbors.size(); ++i)
+		mProperties->mNeighbors[i] = NULL;
 }
 
 void Node::Init(std::vector<Node*> neighbors)
 {
-	for (int i = 0; i < neighbors.size(); ++i)
-		mNeighbors.push_back(neighbors[i]);
+	if (neighbors.size() == 0)
+	{
+		for (int i = 0; i < neighbors.size(); ++i)
+			mProperties->mNeighbors.push_back(neighbors[i]);
+	}
+	else
+	{
+		// Error
+	}
 }
 
-void Node::SetState(State state)
+void Node::SetState(NodeState state)
 {
-	mCurrentState = state;
+	mProperties->mCurrentState = state;
 }
 
-State Node::GetState()
+NodeState Node::GetState()
 {
-	return mCurrentState;
+	return mProperties->mCurrentState;
 }
 
 bool Node::IsAlive()
 {
-	return (GetState() == State::Alive || GetState() == State::WillStayAlive);
+	return (GetState() == NodeState::Alive || GetState() == NodeState::WillStayAlive);
 }
 
 bool Node::IsAlreadyCheckedThisRound(int round)
 {
-	if (mCurrentRound != round)
+	if (mProperties->mCurrentRound != round)
 		return false;
 	else
 	{
-		return (GetState() == State::WaitingForRevive
-			|| GetState() == State::WillStayAlive
-			|| GetState() == State::WillStayDead);
+		return (GetState() == NodeState::WaitingForRevive
+			|| GetState() == NodeState::WillStayAlive
+			|| GetState() == NodeState::WillStayDead);
 	}
 }
 
-// TODO: Rename this
-std::vector<Node*> Node::GetRevivableNeighbours(int round)
+std::vector<Node*> Node::GetAliveNotCheckedNeighboursAfterGivenRound(int round)
 {
 	std::vector<Node*> revivableNodes;
 
-	for (int i = 0; i < mNeighbors.size(); ++i)
+	for (int i = 0; i < mProperties->mNeighbors.size(); ++i)
 	{
-		if (!mNeighbors[i]->IsAlreadyCheckedThisRound(round))
+		if (!mProperties->mNeighbors[i]->IsAlreadyCheckedThisRound(round))
 		{
-			bool alive = mNeighbors[i]->IsAliveNextRound(round);
+			bool alive = mProperties->mNeighbors[i]->IsAliveNextRound(round);
 			if (alive)
-				revivableNodes.push_back(mNeighbors[i]);
+				revivableNodes.push_back(mProperties->mNeighbors[i]);
 		}
 	}
 
@@ -67,38 +85,38 @@ bool Node::IsAliveNextRound(int round)
 {
 	// If round numbers match
 	// -> current data is already valid
-	if (mCurrentRound != round)
+	if (mProperties->mCurrentRound != round)
 	{
 		// NOTE: This state is not cleared by the Nodemanager
-		if (mCurrentState == State::WillStayDead)
-			mCurrentState = State::Dead;
+		if (mProperties->mCurrentState == NodeState::WillStayDead)
+			mProperties->mCurrentState = NodeState::Dead;
 
-		mCurrentRound = round;
-		mIsAliveAfterThisRound = false;
+		mProperties->mCurrentRound = round;
+		mProperties->mIsAliveAfterThisRound = false;
 
 		int aliveNeighbors = 0;
-		for (int i = 0; i < mNeighbors.size(); ++i)
+		for (int i = 0; i < mProperties->mNeighbors.size(); ++i)
 		{
-			if (mNeighbors[i]->IsAlive())
+			if (mProperties->mNeighbors[i]->IsAlive())
 				++aliveNeighbors;
 
-			if (mCurrentState == State::Dead)
+			if (mProperties->mCurrentState == NodeState::Dead)
 			{
 				if(aliveNeighbors == 3)
-					mIsAliveAfterThisRound = true;
+					mProperties->mIsAliveAfterThisRound = true;
 				else if (aliveNeighbors > 3)
 				{
-					mIsAliveAfterThisRound = false;
+					mProperties->mIsAliveAfterThisRound = false;
 					break;
 				}
 			}
-			else if (mCurrentState == State::Alive)
+			else if (mProperties->mCurrentState == NodeState::Alive)
 			{
 				if (aliveNeighbors >= 2 && aliveNeighbors <= 3)
-					mIsAliveAfterThisRound = true;
+					mProperties->mIsAliveAfterThisRound = true;
 				else if (aliveNeighbors > 3)
 				{
-					mIsAliveAfterThisRound = false;
+					mProperties->mIsAliveAfterThisRound = false;
 					break;
 				}
 			}
@@ -108,18 +126,18 @@ bool Node::IsAliveNextRound(int round)
 			}
 		}
 
-		if (mCurrentState == State::Dead && mIsAliveAfterThisRound)
-			mCurrentState = State::WaitingForRevive;
-		else if (mCurrentState == State::Dead && !mIsAliveAfterThisRound)
-			mCurrentState = State::WillStayDead;
-		else if (mCurrentState == State::Alive && mIsAliveAfterThisRound)
-			mCurrentState = State::WillStayAlive;
+		if (mProperties->mCurrentState == NodeState::Dead && mProperties->mIsAliveAfterThisRound)
+			mProperties->mCurrentState = NodeState::WaitingForRevive;
+		else if (mProperties->mCurrentState == NodeState::Dead && !mProperties->mIsAliveAfterThisRound)
+			mProperties->mCurrentState = NodeState::WillStayDead;
+		else if (mProperties->mCurrentState == NodeState::Alive && mProperties->mIsAliveAfterThisRound)
+			mProperties->mCurrentState = NodeState::WillStayAlive;
 	}
 
-	return mIsAliveAfterThisRound;
+	return mProperties->mIsAliveAfterThisRound;
 }
 
 int Node::GetNodeId()
 {
-	return mNodeId;
+	return mProperties->mNodeId;
 }

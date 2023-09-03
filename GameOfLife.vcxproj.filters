@@ -50,5 +50,8 @@
     <ClInclude Include="source\testing\TestInputs.h">
       <Filter>Header Files\Testing</Filter>
     </ClInclude>
+    <ClInclude Include="source\game\DisableCopy.h">
+      <Filter>Header Files\Game</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

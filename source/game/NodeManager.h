@@ -2,38 +2,54 @@
 #ifndef __NODEMANAGER_H__
 #define __NODEMANAGER_H__
 
+#include "DisableCopy.h"
 #include "Node.h"
 
 #include <string>
-#include <vector>
 
-class NodeManager
+struct NodeManagerProperties;
+
+class NodeManager : DisableCopy
 {
 public:
-	NodeManager(int boardHeight, int boardWidth);
+	/*!
+	* @brief NodeManager constructor
+	* @param boardWidth board size in x direction
+	* @param boardHeight board size in y direction
+	**/
+	NodeManager(int boardWidth, int boardHeight);
+
+	/*!
+	* @brief NodeManager destructor
+	**/
 	~NodeManager();
 
 	/*!
-	* \brief Rakentaja kortin, jossa on annettu kuva, linkkitietorakenne ja tieto kortin varista
-	* \param pic Korttiin asetettava QPixmap kuva
-	* \param links Kortin reiteista kertova linkkitietorakenne
-	* \param col Korttiin asetettavan nappulan vari
-	* \pre links.size() == 4
+	* @brief Gets string that reflects current node statuses
+	* @return current board status as a string
 	**/
 	std::string GetNodeString();
 
+	/*!
+	* @brief Tries to set Node alive using given cordinates. If invalid cordinates -> nothing happens
+	* @param x x-cordinate for the Node.
+	* @param y y-cordinate for the Node.
+	**/
 	void ReviveNode(int x, int y);
+
+	/*!
+	* @brief Reacts to game round advancement.
+	* @param round new round number.
+	**/
 	void AdvanceRound(int round);
 
 private:
+	/*!
+	* @brief Creates Nodes and inits their neighbours
+	**/
 	void CreateNodes();
 
-	int mBoardHeight;
-	int mBoardWidth;
-	std::string mBoardString = "";
-
-	std::vector<Node*> mAllNodes;
-	std::vector<Node*> mAliveNodes;
+	NodeManagerProperties* mProperties;
 };
 
 #endif // __NODEMANAGER_H__

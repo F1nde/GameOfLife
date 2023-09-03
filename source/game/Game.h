@@ -2,10 +2,12 @@
 #ifndef __GAME_H__
 #define __GAME_H__
 
+#include "DisableCopy.h"
 #include "Nodemanager.h"
 
 #include <string>
-#include <vector>
+
+struct GameProperties;
 
 enum class GameState
 {
@@ -17,7 +19,7 @@ enum class GameState
 };
 
 /*!
-* \brief Game class that presents the game
+* @brief Game class that presents the game
 * 
 * Class is responsible for
 * - Creating necessary game components
@@ -55,107 +57,87 @@ enum class GameState
 * - This stage will set game back to initial stage and set GameState to Init. 
 **/
 
-class Game
+class Game : DisableCopy
 {
 public:
+	/*!
+	* @brief Game constructor
+	**/
 	Game();
+
+	/*!
+	* @brief Game destructor
+	**/
 	~Game();
 
 	/*!
-	* \brief Starts the game
+	* @brief Starts the game loop
 	**/
 	void StartGame();
 
 private:
 	/*!
-* \brief Starts the game
-* \param pic Korttiin asetettava QPixmap kuva
-* \param links Kortin reiteista kertova linkkitietorakenne
-* \param col Korttiin asetettavan nappulan vari
-* \pre links.size() == 4
-**/
-
-	/*!
-	* \brief Couts instructions for the player.
+	* @brief Couts instructions for the player.
 	**/
 	void ShowRules();
 
 	/*!
-	* \brief Game update loop (state machine).
+	* @brief Game update loop (state machine).
 	**/
 	void Update();
 
 	/*!
-	* \brief TODO
+	* @brief TODO
 	**/
 	void InitBoard();
 
 	/*!
-	* \brief TODO
+	* @brief TODO
 	**/
 	void InitLivingCells();
 
 	/*!
-	* \brief TODO
+	* @brief TODO
 	**/
 	void RunTheGame();
 
 	/*!
-	* \brief TODO
+	* @brief TODO
 	**/
 	std::string GetPlayerInput();
 
 	/*!
-	* \brief TODO
+	* @brief TODO
 	**/
 	bool HandlePlayerInput(std::string input);
 
 	/*!
-	* \brief Advances game by one round.
+	* @brief Advances game by one round.
 	**/
 	void NextRound();
 
 	/*!
-	* \brief Couts the game board
+	* @brief Couts the game board.
 	**/
 	void ShowBoard();
 
 	/*!
-	* \brief Resets game to initial state
+	* @brief Resets game to initial state.
 	**/
 	void ResetGame();
 
 	/*!
-	* \brief Calls system to clear the user's console
+	* @brief Calls system to clear the user's console.
 	**/
 	void ClearScreen();
 
 	/*!
-	* \brief Gets test case inputs from TestInputs and sets
-	*		 game to testing mode.
+	* @brief Gets test case inputs from TestInputs and sets game to testing mode.
 	**/
 	void RunTestCase(int id);
 
-	// N‰‰ voi laittaa structiin
-	GameProperties* mGameProperties;
-
-	// Board size
-	int mHeight = 0;
-	int mWidth = 0;
-
-	// Node Management
-	NodeManager* mNodeManager = NULL;
-
 	// Game properties
-	GameState mGameState = GameState::Init;
-	bool mAutoPlay = false;
-	int mRound = 0;
-	//bool mDarkMode = false;
-
-	// Auto testing
-	bool mTestingMode = false;
-	std::vector<std::string>::iterator mInputItr;
-	std::vector<std::string> mTestingInputs;
+	GameProperties* mGameProperties;
 };
 
 #endif // __GAME_H__

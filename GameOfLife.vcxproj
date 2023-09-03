@@ -25,6 +25,7 @@
     <ClCompile Include="source\game\NodeManager.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="source\game\DisableCopy.h" />
     <ClInclude Include="source\game\Game.h" />
     <ClInclude Include="source\game\Node.h" />
     <ClInclude Include="source\game\NodeManager.h" />
