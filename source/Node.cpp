@@ -30,7 +30,7 @@ Node::~Node()
 
 void Node::Init(std::vector<Node*> neighbors)
 {
-	if (neighbors.size() == 0)
+	if (neighbors.size() != 0)
 	{
 		for (int i = 0; i < neighbors.size(); ++i)
 			mProperties->mNeighbors.push_back(neighbors[i]);
