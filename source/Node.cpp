@@ -130,7 +130,7 @@ bool Node::IsAliveNextRound(int round)
 			}
 		}
 
-		// Set the Node's current state to a temporary state that helps the NodeManager
+		// Set the Node's current state to a temporary state that helps to
 		// determine whether it will stay in its current state or needs to be revived.
 		if (mProperties->mCurrentState == NodeState::Dead && mProperties->mIsAliveAfterThisRound)
 			mProperties->mCurrentState = NodeState::WaitingForRevive;
