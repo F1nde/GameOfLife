@@ -2,13 +2,14 @@
 #ifndef __DISABLECOPY_H__
 #define __DISABLECOPY_H__
 
+// Inherit from this class to disable the copy constructor and assignment operators.
+
 class DisableCopy
 {
 public:
 	DisableCopy() = default;
 	~DisableCopy() = default;
 
-	// Disable copy constructor and assignement operators
 	DisableCopy(const DisableCopy&) = delete;
 	DisableCopy& operator=(DisableCopy&) = delete;
 };

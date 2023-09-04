@@ -2,7 +2,28 @@
 #include <string>
 #include <vector>
 
-// Cases: https://en.wikipedia.org/wiki/Conway%27s_Game_of_Life
+// Test cases (section Examples of patterns):
+// https://en.wikipedia.org/wiki/Conway%27s_Game_of_Life
+
+// Still lifes
+//- 1 => Block
+//- 2 => Bee-hive
+//- 3 => Loaf
+//- 4 => Boat
+//- 5 => Tub
+
+// Oscillators
+//- 6 => Blinker
+//- 7 => Toad
+//- 8 => Beacon
+//- 9 => Pulsar
+//- 10 => Penta-decathlon
+
+// Spaceships
+//- 11 => Glider
+//- 12 => Light-weight spaceship
+//- 13 => Middle-weight spaceship
+//- 14 => Heavy-weight spaceship
 
 std::vector<std::string> GetTestInputs(int id)
 {
@@ -171,10 +192,7 @@ std::vector<std::string> GetTestInputs(int id)
 	}
 
 	if (inputs.size() != 0)
-	{
 		inputs.push_back("s");
-		//inputs.push_back("d");
-	}
 
 	return inputs;
 }

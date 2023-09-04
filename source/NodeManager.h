@@ -8,43 +8,53 @@
 
 struct NodeManagerProperties;
 
+/*!
+* @brief NodeManager class works as an intermediate between the Game and Nodes.
+* 
+* This class is responsible for:
+* - Creating and initializing Nodes.
+* - Keeping track of which Nodes are currently alive.
+* - Maintaining a BoardString that contains information about the current Node statuses.
+* - Forwarding information from the Game to Nodes.
+*/
+
 class NodeManager : DisableCopy
 {
 public:
 	/*!
-	* @brief NodeManager constructor
-	* @param boardWidth board size in x direction
-	* @param boardHeight board size in y direction
+	* @brief Default constructor.
+	* @param boardWidth Board size in the x direction.
+	* @param boardHeight Board size in the y direction.
 	**/
 	NodeManager(int boardWidth, int boardHeight);
 
 	/*!
-	* @brief NodeManager destructor
+	* @brief Default destructor.
 	**/
 	~NodeManager();
 
 	/*!
-	* @brief Gets string that reflects current node statuses
-	* @return current board status as a string
+	* @brief Gets a string that reflects the current node statuses.
+	* @return Current board status as a string.
 	**/
 	std::string GetNodeString();
 
 	/*!
-	* @brief Tries to set Node alive using given cordinates. If invalid cordinates -> nothing happens
-	* @param x x-cordinate for the Node.
-	* @param y y-cordinate for the Node.
+	* @brief Tries to set a Node alive using given coordinates. If invalid coordinates, nothing happens.
+	* @param x X-coordinate for the Node.
+	* @param y Y-coordinate for the Node.
 	**/
 	void ReviveNode(int x, int y);
 
 	/*!
-	* @brief Reacts to game round advancement.
-	* @param round new round number.
+	* @brief Reacts to the advancement of a game round.
+	* @param round New round number.
 	**/
 	void AdvanceRound(int round);
 
 private:
 	/*!
-	* @brief Creates Nodes and inits their neighbours
+	* @brief Creates Nodes and initializes their neighbors.
 	**/
 	void CreateNodes();
 

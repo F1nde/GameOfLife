@@ -18,65 +18,67 @@ enum class GameState
 };
 
 /*!
-* @brief Game class that presents the game
+* @brief Game class that manages the game.
 * 
-* Class is responsible for
-* - Creating necessary game components
-* - Collecting user input and reacting to it
-* - Managing game flow using GameStates
+* This class is responsible for:
+* - Creating the necessary game components.
+* - Collecting user input and reacting to it.
+* - Managing the game flow using GameStates.
 * 
-* Game flow starts when StartGame() function is called.
+* The game flow starts when the StartGame() function is called.
 * 
 * GameState Init:
-* - Initial state after game starts. In this state the user can:
-* -- 1. Restart the game: this will set the game to Restarting state.
-* -- 2. End the game: this will set game to GameEnding state.
-* -- 3. Define board size: this will create NodeManager with Nodes acording to the size of a board and advance game to PreGame state.
-* -- 4. Run test inputs: this will start feeding inputs defined in TestInputs.h to the game until all defined inputs run out.
+* - The initial state after the game starts. In this state, the user can:
+* -- Restart the game: This will set the game to the Restarting state.
+* -- End the game: This will set the game to the GameEnding state.
+* -- Define board size: This will create a NodeManager with nodes according to the size of the board and
+	 advance the game to the PreGame state.
+* -- Run test inputs: This will start feeding inputs defined in TestInputs.h to the game until all defined
+	 inputs run out.
 * 
 * GameState PreGame:
-* - Game is ready to be played. In this state the user can:
-* -- 1. Restart the game: this will set the game to Restarting state.
-* -- 2. End the game: this will set game to GameEnding state.
-* -- 3. Define living nodes: this will inform NodeManager to set Node in given cordinates to living state.
-* -- 4. Start the game: this will advance game to GameRunning state.
-* 
+* - The game is ready to be played. In this state, the user can:
+* -- Restart the game: This will set the game to the Restarting state.
+* -- End the game: This will set the game to the GameEnding state.
+* -- Define living nodes: This will inform NodeManager to set a node at the given coordinates to a living state.
+* -- Start the game: This will advance the game to the GameRunning state.
+*
 * GameState GameRunning:
-* - Game is running. Game consists of rounds which that can be advanced by the user or set to automatic.
-*   When round changes it will be informed to NodeManager. In this state the user can:
-* -- 1. Restart the game: this will set the game to Restarting state.
-* -- 2. End the game: this will set game to GameEnding state.
-* -- 3. Set game to automatic: this will advance game round in time intervals.
-* -- 4. Move to next round: this will advance game by one round.
+* - The game is running. The game consists of rounds that can be advanced by the user or set to automatic.
+*   When the round changes, it will be informed to NodeManager. In this state, the user can:
+* -- Restart the game: This will set the game to the Restarting state.
+* -- End the game: This will set the game to the GameEnding state.
+* -- Set the game to automatic: This will advance the game rounds at time intervals.
+* -- Move to the next round: This will advance the game by one round.
 * 
 * GameState GameEnding:
-* - This stage will end the game loop of the game, returning code execution to where StartGame() was called.
-* 
+* - This stage will end the game loop, returning code execution to where StartGame() was called.
+*
 * GameState Restarting:
-* - This stage will set game back to initial stage and set GameState to Init. 
+* - This stage will set the game back to its initial state and set the GameState to Init.
 **/
 
 class Game : DisableCopy
 {
 public:
 	/*!
-	* @brief Game constructor
+	* @brief Default constructor.
 	**/
 	Game();
 
 	/*!
-	* @brief Game destructor
+	* @brief Default destructor.
 	**/
 	~Game();
 
 	/*!
-	* @brief Starts the game loop
+	* @brief Starts the game loop.
 	**/
 	void StartGame();
 
 private:
 	/*!
-	* @brief Couts instructions for the player.
+	* @brief Outputs instructions for the player.
 	**/
 	void ShowRules();
 
@@ -86,54 +88,58 @@ private:
 	void Update();
 
 	/*!
-	* @brief TODO
+	* @brief Implements GameState Init functionality.
 	**/
 	void InitBoard();
 
 	/*!
-	* @brief TODO
+	* @brief Implements GameState PreGame functionality.
 	**/
 	void InitLivingCells();
 
 	/*!
-	* @brief TODO
+	* @brief Implements GameState GameRunning functionality.
 	**/
 	void RunTheGame();
 
 	/*!
-	* @brief TODO
+	* @brief Requests input from the user.
+	* @return User's input as a string.
 	**/
 	std::string GetPlayerInput();
 
 	/*!
-	* @brief TODO
+	* @brief Handles user input.
+	* @param input Input to be parsed and reacted to.
+	* @return True if input was valid and caused any changes, otherwise false.
 	**/
 	bool HandlePlayerInput(std::string input);
 
 	/*!
-	* @brief Advances game by one round.
+	* @brief Advances the game by one round.
 	**/
 	void NextRound();
 
 	/*!
-	* @brief Couts the game board.
+	* @brief Outputs the game board.
 	**/
 	void ShowBoard();
 
 	/*!
-	* @brief Resets game to initial state.
+	* @brief Resets the game to its initial state.
 	**/
 	void ResetGame();
 
 	/*!
-	* @brief Calls system to clear the user's console.
+	* @brief Calls the system to clear the user's console.
 	**/
 	void ClearScreen();
 
 	/*!
-	* @brief Gets test case inputs from TestInputs and sets game to testing mode.
+	* @brief Gets test case inputs from TestInputs.h and sets the game to testing mode.
+	* @param testCaseId Identifier of the test case to run.
 	**/
-	void RunTestCase(int id);
+	void RunTestCase(int testCaseId);
 
 	// Game properties
 	GameProperties* mGameProperties;

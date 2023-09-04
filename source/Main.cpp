@@ -1,20 +1,15 @@
 
 // Game Of Life
-
-// Game rules and more info
 // https://en.wikipedia.org/wiki/Conway%27s_Game_of_Life
 
 /*!
-* This program composes of 3 classes: Game, NodeManager, Node
-* - Game presents the actual game that is being played.
-* - Node presents cells in the game rules.
-* - NodeManger presents a controller between Game and Nodes.
+* This program consists of three classes: Game, NodeManager, and Node.
+* - Game represents the actual game that is being played.
+* - Node represents cells in the game's rules.
+* - NodeManager serves as a controller between Game and Nodes.
 *
-* NOTE: TestingInput.h can be used to predetermine user inputs to the game for faster testing.
+* NOTE: TestingInput.h can be used to predetermine user inputs for faster testing of the game.
 **/
-
-// Code by Marko Tuominen
-// https://github.com/F1nde/GameOfLife
 
 #include "Game.h"
 

@@ -6,7 +6,6 @@
 #include <stdlib.h>
 #include <algorithm>
 #include <iostream>
-
 #include <chrono>
 #include <thread>
 
@@ -417,9 +416,9 @@ void Game::ClearScreen()
 #endif
 }
 
-void Game::RunTestCase(int id)
+void Game::RunTestCase(int testCaseId)
 {
-	std::vector<std::string> inputs = GetTestInputs(id);
+	std::vector<std::string> inputs = GetTestInputs(testCaseId);
 
 	if (inputs.size() != 0)
 	{
