@@ -18,7 +18,7 @@ using namespace std::chrono;
 
 struct GameProperties
 {
-	// Board size
+	// Board
 	int mHeight = 0;
 	int mWidth = 0;
 
@@ -28,7 +28,7 @@ struct GameProperties
 	// Current game state
 	GameState mGameState = GameState::Init;
 
-	// Determines if game waits for player input when advancing game rounds.
+	// Determines if the game waits for player input when advancing game rounds
 	bool mAutoPlay = false;
 
 	// Current round number.
@@ -60,6 +60,9 @@ void Game::StartGame()
 	Update();
 }
 
+// Private
+//--------------------------------------
+
 void Game::ShowRules()
 {
 	switch (mGameProperties->mGameState)
@@ -87,12 +90,12 @@ void Game::ShowRules()
 			cout << "- 14 => Heavy-weight spaceship" << '\n' << '\n';
 
 			cout << "Inputs:" << '\n';
-			cout << "- r => Restarts the game" << '\n';
+			cout << "- r => Restart the game" << '\n';
 			cout << "- e => Exit the program" << '\n' << '\n';
 
-			cout << "Board Size" << '\n';
-			cout << "- Input: Width x Heigh (Example: 3x5)" << '\n';
-			cout << "- Both numbers need to be positive numbers" << '\n' << '\n';
+			cout << "Board Size:" << '\n';
+			cout << "- Input: Width x Height (Example: 3x5)" << '\n';
+			cout << "- Both numbers need to be positive integers" << '\n' << '\n';
 			break;
 		}
 		case GameState::PreGame:
@@ -102,33 +105,32 @@ void Game::ShowRules()
 			cout << "------------------------------------------" << '\n' << '\n';
 
 			cout << "Inputs:" << '\n';
-			cout << "- r => Restarts the game" << '\n';
+			cout << "- r => Restart the game" << '\n';
 			cout << "- e => Exit the program" << '\n';
-			cout << "- s => Starts the game" << '\n';
+			cout << "- s => Start the game" << '\n' << '\n';
 
 			cout << "Living cells" << '\n';
 			cout << "- Input: posX x posY (Example: 3x5)" << '\n';
-			cout << "- Both numbers need to be inside game board" << '\n';
-			cout << "- NOTE: Indexes starts from 0 so in 3x3 board top left corner is 0x0 and bottom right corner is 2x2" << '\n';
+			cout << "- Both numbers need to be within the game board" << '\n';
+			cout << "- NOTE: Indexes start from 0, so in a 3x3 board, the top-left corner is 0x0, and the bottom-right corner is 2x2" << '\n';
 
 			break;
 		}
 		case GameState::GameRunning:
 		{
 			cout << "Inputs:" << '\n';
-			cout << "- r => Restarts the game" << '\n';
+			cout << "- r => Restart the game" << '\n';
 			cout << "- e => Exit the program" << '\n';
 			cout << "- a => Start automatic stage changing" << '\n';
-			cout << "- n => Move to next stage" << '\n' << '\n';
+			cout << "- n => Move to the next stage" << '\n' << '\n';
 
 			break;
 		}
-		case GameState::GameEnding:
-			break;
-		case GameState::Restarting:
-			break;
 		default:
+		{
+			std::cout << "Error: No rules defined for this GameState" << '\n';
 			break;
+		}
 	}
 }
 
@@ -186,7 +188,11 @@ void Game::Update()
 				break;
 			}
 			default:
+			{
+				std::cout << "Error: Update functionality not defined for this GameState." << '\n';
+				playing = false;
 				break;
+			}
 		}
 	}
 }
@@ -210,7 +216,7 @@ void Game::InitLivingCells()
 	if (!mGameProperties->mTestingMode)
 	{
 		ShowBoard();
-		cout << "Cordinates for a living cell: ";
+		cout << "Coordinates for a living cell: ";
 	}
 
 	std::string input = GetPlayerInput();
@@ -262,12 +268,12 @@ bool Game::HandlePlayerInput(std::string input)
 	bool inputIsValid = true;
 	if (input == "r")
 	{
-		cout << "Restarting the game" << '\n';
+		cout << "Restarting the game." << '\n';
 		mGameProperties->mGameState = GameState::Restarting;
 	}
 	else if (input == "e")
 	{
-		cout << "Ending the game" << '\n';
+		cout << "Ending the game." << '\n';
 		mGameProperties->mGameState = GameState::GameEnding;
 	}
 	else if (input == "s")
@@ -340,7 +346,7 @@ bool Game::HandlePlayerInput(std::string input)
 		}
 		catch (std::invalid_argument const& ex)
 		{
-			std::cerr << ex.what();
+			(void)ex;
 			inputIsValid = false;
 		}
 	}
@@ -348,9 +354,9 @@ bool Game::HandlePlayerInput(std::string input)
 	if (!inputIsValid)
 	{
 		if (mGameProperties->mGameState == GameState::Init)
-			std::cout << "Error: Invalid board size (both needs to be numbers over 0)." << '\n';
+			std::cout << "Error: Invalid board size (both must be numbers greater than 0)." << '\n';
 		else if (mGameProperties->mGameState == GameState::PreGame)
-			std::cout << "Error: Invalid cordinates (cordinates are not inside the game board)." << '\n';
+			std::cout << "Error: Invalid coordinates (invalid input or coordinates are not within the game board)." << '\n';
 	}
 
 	return inputIsValid;
@@ -417,6 +423,8 @@ void Game::ResetGame()
 	mGameProperties = NULL;
 
 	ClearScreen();
+
+	mGameProperties = new GameProperties();
 }
 
 void Game::ClearScreen()

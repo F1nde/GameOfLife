@@ -1,16 +1,22 @@
 
 #include "Node.h"
 
+#include <iostream>
 #include <cstddef>
 
 struct NodeProperties
 {
+	// Node Id in the boardString
 	int mNodeId = 0;
+
+	// Current Node state
 	NodeState mCurrentState = NodeState::Dead;
+
+	// Neighbor Nodes
 	std::vector<Node*> mNeighbors = std::vector<Node*>();
 
-	// This round
-	int mCurrentRound = 0;
+	// Round checks
+	int mLastCheckedRound = 0;
 	bool mIsAliveAfterThisRound = true;
 };
 
@@ -23,9 +29,7 @@ Node::Node(int id)
 Node::~Node()
 {
 	for (int i = 0; i < mProperties->mNeighbors.size(); ++i)
-	{
 		mProperties->mNeighbors[i] = NULL;
-	}
 }
 
 void Node::Init(std::vector<Node*> neighbors)
@@ -36,9 +40,7 @@ void Node::Init(std::vector<Node*> neighbors)
 			mProperties->mNeighbors.push_back(neighbors[i]);
 	}
 	else
-	{
-		// Error
-	}
+		std::cout << "Error: Neighbors are already defined." << '\n';
 }
 
 void Node::SetState(NodeState state)
@@ -58,7 +60,7 @@ bool Node::IsAlive()
 
 bool Node::IsAlreadyCheckedThisRound(int round)
 {
-	if (mProperties->mCurrentRound != round)
+	if (mProperties->mLastCheckedRound != round)
 		return false;
 	else
 	{
@@ -87,17 +89,19 @@ std::vector<Node*> Node::GetAliveNotCheckedNeighboursAfterGivenRound(int round)
 
 bool Node::IsAliveNextRound(int round)
 {
-	// If round numbers match
-	// -> current data is already valid
-	if (mProperties->mCurrentRound != round)
+	// If the round numbers match, we already have valid data.
+	if (mProperties->mLastCheckedRound != round)
 	{
-		// NOTE: This state is not cleared by the Nodemanager
+		// NOTE: NodeStates WaitingForRevive and WillStayAlive are cleared by the NodeManager,
+		// while WillStayDead is not cleared by the NodeManager, so let's clear it now.
 		if (mProperties->mCurrentState == NodeState::WillStayDead)
 			mProperties->mCurrentState = NodeState::Dead;
 
-		mProperties->mCurrentRound = round;
+		mProperties->mLastCheckedRound = round;
 		mProperties->mIsAliveAfterThisRound = false;
 
+		// Goes trough neighbor Nodes and determines if Node will be
+		// will be dead/alive after this round.
 		int aliveNeighbors = 0;
 		for (int i = 0; i < mProperties->mNeighbors.size(); ++i)
 		{
@@ -124,12 +128,10 @@ bool Node::IsAliveNextRound(int round)
 					break;
 				}
 			}
-			else
-			{
-				// Error
-			}
 		}
 
+		// Set the Node's current state to a temporary state that helps the NodeManager
+		// determine whether it will stay in its current state or needs to be revived.
 		if (mProperties->mCurrentState == NodeState::Dead && mProperties->mIsAliveAfterThisRound)
 			mProperties->mCurrentState = NodeState::WaitingForRevive;
 		else if (mProperties->mCurrentState == NodeState::Dead && !mProperties->mIsAliveAfterThisRound)

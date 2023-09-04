@@ -4,10 +4,15 @@
 
 struct NodeManagerProperties
 {
+	// Board
 	int mBoardHeight = 0;
 	int mBoardWidth = 0;
+
+	// 'x' -> Dead Cell
+	// 'o' -> Living Cell
 	std::string mBoardString = "";
 
+	// Nodes
 	std::vector<Node*> mAllNodes;
 	std::vector<Node*> mAliveNodes;
 };
@@ -47,6 +52,7 @@ std::string NodeManager::GetNodeString()
 
 void NodeManager::ReviveNode(int x, int y)
 {
+	// Revive a Node if it is dead and its coordinates are within the game board.
 	int index = x + y * mProperties->mBoardWidth;
 	if (index >= 0 && index < mProperties->mAllNodes.size() && mProperties->mAllNodes[index]->GetState() != NodeState::Alive)
 	{
@@ -61,11 +67,11 @@ void NodeManager::AdvanceRound(int round)
 	std::vector<Node*> aliveNodesNextRound;
 	for (int i = 0; i < mProperties->mAliveNodes.size(); ++i)
 	{
-		// Get revivable neighbors from the node
+		// Retrieve revivable neighbors for the Node.
 		auto nodes = mProperties->mAliveNodes[i]->GetAliveNotCheckedNeighboursAfterGivenRound(round);
 		aliveNodesNextRound.insert(aliveNodesNextRound.end(), nodes.begin(), nodes.end());
 
-		// Then check if the node itself will be alive
+		// Then, check if the Node itself will be alive.
 		if (mProperties->mAliveNodes[i]->IsAliveNextRound(round))
 			aliveNodesNextRound.push_back(mProperties->mAliveNodes[i]);
 		else
@@ -75,12 +81,14 @@ void NodeManager::AdvanceRound(int round)
 		}
 	}
 
+	// Set the next round's alive Nodes to the Alive state and store information in the BoardString.
 	for (int i = 0; i < aliveNodesNextRound.size(); ++i)
 	{
 		aliveNodesNextRound[i]->SetState(NodeState::Alive);
 		mProperties->mBoardString[aliveNodesNextRound[i]->GetNodeId()] = 'o';
 	}
 
+	// Store alive nodes for future use.
 	mProperties->mAliveNodes.clear();
 	mProperties->mAliveNodes = aliveNodesNextRound;
 }
@@ -90,7 +98,7 @@ void NodeManager::AdvanceRound(int round)
 
 void NodeManager::CreateNodes()
 {
-	// Init Nodes
+	// Initialize Nodes
 	int lastIndex = mProperties->mBoardHeight * mProperties->mBoardWidth;
 	for (int i = 0; i < lastIndex; ++i)
 	{
@@ -98,7 +106,7 @@ void NodeManager::CreateNodes()
 		mProperties->mAllNodes.push_back(node);
 	}
 
-	// Init neighbours for Nodes
+	// Initialize neighbors for Nodes.
 	for (int i = 0; i < mProperties->mAllNodes.size(); ++i)
 	{
 		std::vector<Node*> neighbors;
@@ -113,7 +121,7 @@ void NodeManager::CreateNodes()
 				// Vector index
 				int index = i + (y * mProperties->mBoardWidth) + x;
 
-				// Validity checks for neighbours
+				// Validity checks for neighbors
 				bool indexIsInsideBoard = (index >= 0 && index < lastIndex);
 				bool indexIsOnRightRow = (index >= rowMin && index <= rowMax);
 
