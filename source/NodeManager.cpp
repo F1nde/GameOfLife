@@ -19,7 +19,8 @@ NodeManager::NodeManager(int boardWidth, int boardHeight)
 	mProperties->mBoardHeight = boardHeight;
 	mProperties->mBoardWidth = boardWidth;
 
-	mProperties->mBoardString = std::string(mProperties->mBoardHeight * mProperties->mBoardWidth, 'x');
+	int boardStringLenght = mProperties->mBoardHeight * mProperties->mBoardWidth;
+	mProperties->mBoardString = std::string(boardStringLenght, 'x');
 
 	CreateNodes();
 }

@@ -340,6 +340,7 @@ bool Game::HandlePlayerInput(std::string input)
 		}
 		catch (std::invalid_argument const& ex)
 		{
+			std::cerr << ex.what();
 			inputIsValid = false;
 		}
 	}
@@ -364,7 +365,6 @@ void Game::NextRound()
 	ShowBoard();
 }
 
-// TODO: Selkeytä
 void Game::ShowBoard()
 {
 	cout << '\n';
@@ -372,27 +372,40 @@ void Game::ShowBoard()
 	std::string boardString = mGameProperties->mNodeManager->GetNodeString();
 	for (int i = 0; i < mGameProperties->mHeight; ++i)
 	{
-		std::string line = std::string(mGameProperties->mWidth * 2 + 1, '-');
-		std::cout << "  " << line << '\n';
-
-		string sub = boardString.substr(i * mGameProperties->mWidth, mGameProperties->mWidth);
-
-		int characters = sub.length();
-		for (int j = 0; j < characters; ++j)
+		// This is horizontal "wall line" at the top of the board and between lines.
 		{
-			sub.insert(j*2, "|");
+			int firstLineLength = mGameProperties->mWidth * 2 + 1;
+			std::string line = std::string(firstLineLength, '-');
+			std::cout << "  " << line << '\n';
 		}
 
-		sub.append("|");
-		std::replace(sub.begin(), sub.end(), 'x', ' '); // replace all 'x' to ' '
+		// One line of boardString.
+		int lineStart = i * mGameProperties->mWidth;
+		string line = boardString.substr(lineStart, mGameProperties->mWidth);
 
-		std::cout << "  " << sub << '\n';
+		// This is vertical "wall line" between cells.
+		{
+			size_t characters = line.length();
+			for (int j = 0; j < characters; ++j)
+			{
+				int index = j * 2;
+				line.insert(index, "|");
+			}
+
+			line.append("|");
+		}
+
+		// Empty nodes are marked as 'x'. The board looks clearer without showing
+		// 'x' on the board, so let's replace them with 'space' characters.
+		std::replace(line.begin(), line.end(), 'x', ' ');
+		
+		std::cout << "  " << line << '\n';
 	}
 
-	std::string lastLine = std::string(mGameProperties->mWidth * 2 + 1, '-');
-	std::cout << "  " << lastLine << '\n';
+	int lastLineLength = mGameProperties->mWidth * 2 + 1;
+	std::string lastLine = std::string(lastLineLength, '-');
 
-	cout << '\n';
+	std::cout << "  " << lastLine << '\n' << '\n';
 }
 
 void Game::ResetGame()
